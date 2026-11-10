@@ -6,7 +6,26 @@
 
 ## 怎麼看
 
-用瀏覽器直接打開 `index.html` 就可以，不需要安裝任何東西。
+- 網站：https://s9112004.github.io/japan-singer-web/
+- 本機：用瀏覽器直接打開 `index.html`，不需要安裝任何東西，也沒有後端。
+
+## 檔案
+
+| 檔案 | 用途 |
+|---|---|
+| `page.html` | 頁面本體（版面、樣式、資料、程式），也是 claude.ai Artifact 版本的原始檔 |
+| `head.html` | HTML 外框（doctype、手機版 viewport） |
+| `index.html` | 網站實際送出的檔案，等於 `head.html` + `page.html`，不要直接改它 |
+
+改完 `page.html` 後重新產生網站檔：
+
+```bash
+cat head.html page.html > index.html
+```
+
+## 自動更新
+
+Claude 桌面 app 的排程每天台灣時間 9:00、11:30、17:30、20:30 會核對各歌手官方公告，有變更就更新 `page.html`、重新產生 `index.html`，commit 並推上 GitHub，GitHub Pages 會自動重新部署。
 
 - 首頁：歌手海報、下一個要搶的票（倒數）、近五週行事曆、搶票清單、接下來的演出
 - 點歌手海報進入個人頁（網址會變成 `index.html#yonezu` 這種形式，可以收藏）
