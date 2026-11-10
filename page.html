@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
-/* Layout: poster rail of artists (tap = artist page), a big countdown, a 5-week calendar, paper-ticket stubs, then shows.
+/* Layout: poster rail of artists (tap = artist page), a big countdown, a 12-month calendar, paper-ticket stubs, then shows.
    Each artist has its own page at #<artist>, built from the same parts filtered to that artist. */
 :root{
   --bg:#e9edf3; --card:#ffffff; --ink:#1a2030; --muted:#5f6880; --line:#d3d9e3; --soft:#f2f4f8;
@@ -84,18 +84,42 @@ section{display:grid;gap:14px;min-width:0}
 .flag{font-size:11.5px;font-weight:700;color:var(--wait);border:1px dashed var(--wait);border-radius:4px;padding:0 6px;white-space:nowrap}
 .pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:var(--s);background:color-mix(in srgb,var(--s) 14%,transparent)}
 
-/* calendar */
-.cal-wrap{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--line);overflow-x:auto}
-.cal{display:grid;grid-template-columns:repeat(7,minmax(44px,1fr));gap:4px;min-width:330px}
-.cal .dow{font-size:12px;color:var(--muted);text-align:center;padding-bottom:4px;font-weight:700}
-.cal .day{min-height:74px;border-radius:8px;background:var(--soft);padding:5px;display:grid;align-content:start;gap:3px;min-width:0}
-.cal .day .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
-.cal .day.old{opacity:.45}
-.cal .day.today{box-shadow:inset 0 0 0 2px var(--ink)}
-.cal .day.today .n{color:var(--ink);font-weight:600}
-.cal .ev{font-size:11px;line-height:1.25;border-radius:4px;padding:2px 4px;background:color-mix(in srgb,var(--a) 16%,transparent);color:var(--ink);border-left:3px solid var(--a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cal .ev.show{background:none;border-left:0;padding-left:0;color:var(--muted);display:flex;gap:4px;align-items:center}
-.cal .ev.show::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--a);flex:none}
+/* calendar: 12 mini months to scan the year, then a readable list for the chosen month */
+.cal-wrap{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--line)}
+.cal{display:grid;gap:18px}
+.yr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mm{all:unset;box-sizing:border-box;cursor:pointer;display:grid;align-content:start;gap:6px;padding:10px;border-radius:12px;background:var(--soft);border:2px solid transparent;min-width:0;font:inherit;color:inherit;text-align:left}
+.mm:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.mm[aria-pressed="true"]{border-color:var(--ink);background:var(--card)}
+.mm.empty .mm-g{opacity:.5}
+.mm-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-weight:900;font-size:15px}
+.mm-h small{font-size:12.5px;font-weight:700;color:var(--muted)}
+.mm-h small.has{color:var(--ink)}
+.mm-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mm-g span{aspect-ratio:1;display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;color:var(--muted);border-radius:50%;min-width:0}
+.mm-g .dw{aspect-ratio:auto;font-family:var(--f-body);font-size:10px;font-weight:700}
+.mm-g .on{background:var(--a);color:var(--card);font-weight:600}
+.mm-g .old{opacity:.4}
+.mm-g .now{box-shadow:0 0 0 2px var(--ink);color:var(--ink);font-weight:600}
+.mm-g .on.now{color:var(--card)}
+.ag-h{margin:0 0 4px;font-size:18px;font-weight:900}
+.ag-h small{font-size:13px;font-weight:500;color:var(--muted)}
+.cal .toggle{margin-top:10px}
+.ag-day{display:grid;grid-template-columns:62px 1fr;gap:12px;padding:12px 8px;border-top:1px solid var(--line);scroll-margin-top:12px;border-radius:8px}
+.ag-day.old{opacity:.5}
+.ag-day.hit{background:var(--soft)}
+.ag-d{font-family:var(--f-mono);display:grid;align-content:start;line-height:1.2}
+.ag-d b{font-size:20px;font-weight:600}
+.ag-d span{font-family:var(--f-body);font-size:12.5px;color:var(--muted)}
+.ag-day.now .ag-d span{color:var(--soon);font-weight:700}
+.ag-list{display:grid;gap:10px;min-width:0}
+.ag-ev{display:grid;grid-template-columns:10px 1fr;gap:3px 10px;min-width:0}
+.ag-ev i{width:10px;height:10px;border-radius:50%;background:var(--a);margin-top:7px}
+.ag-ev div{font-size:15px;line-height:1.45;min-width:0;overflow-wrap:anywhere}
+.ag-ev div b{color:var(--a);font-weight:900;margin-right:4px}
+.ag-ev span{grid-column:2;font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+.tg{font-style:normal;font-size:12px;font-weight:700;border-radius:4px;padding:1px 6px;margin-right:6px;color:var(--s);background:color-mix(in srgb,var(--s) 14%,transparent);white-space:nowrap}
+.tg.show{--s:var(--muted)}
 
 /* ticket stubs */
 .tickets{display:grid;gap:14px}
@@ -209,6 +233,7 @@ tr.next td.c::after{content:"NEXT";font-family:var(--f-mono);font-size:10px;font
 .srcs{font-size:13px;color:var(--muted);display:flex;gap:6px 16px;flex-wrap:wrap}
 footer{font-size:12.5px;color:var(--muted);max-width:70ch}
 
+@media (max-width:860px){ .yr{grid-template-columns:repeat(3,minmax(0,1fr))} }
 @media (max-width:620px){
   .ticket{grid-template-columns:1fr}
   .ticket .stub{border-left:0;border-top:2px dashed var(--line);grid-template-columns:auto auto 1fr;justify-items:start;align-items:center;text-align:left;padding:12px 16px 12px 22px;gap:4px 14px}
@@ -217,10 +242,12 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
   .ticket .main{border-radius:12px 12px 0 0}
   .stub .big{font-size:26px}
   .stub .gc{justify-self:end}
-  .cal .day{min-height:58px;padding:4px}
-  .cal .ev:not(.show){font-size:0;height:6px;padding:0;border-left-width:0;background:var(--a)}
-  .cal .ev.show{font-size:0}
-  .cal .ev.show::before{width:5px;height:5px}
+  .cal-wrap{padding:12px}
+  .yr{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .mm{padding:8px}
+  .mm-g span{font-size:12px}
+  .ag-day{grid-template-columns:52px 1fr;gap:10px;padding:12px 4px}
+  .ag-d b{font-size:18px}
   .poster{flex-basis:148px;height:200px}
   .upnext a{grid-template-columns:86px 1fr;gap:4px 10px}
   .upnext .who{grid-column:2}
@@ -244,7 +271,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
     </section>
     <section class="hero" id="hero-home" aria-live="polite"></section>
     <section>
-      <h2>近五週行事曆 <small>彩色條＝售票時間點，圓點＝演出</small></h2>
+      <h2>近一年行事曆 <small>色塊＝當天有售票或演出，點月份或日期看清單</small></h2>
       <div class="cal-wrap"><div class="cal" id="cal-home"></div></div>
     </section>
     <section>
@@ -269,7 +296,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
       <button class="toggle" type="button" data-past>顯示已結束的售票</button>
     </section>
     <section>
-      <h2>近五週行事曆</h2>
+      <h2>近一年行事曆 <small>點月份或日期看清單</small></h2>
       <div class="cal-wrap"><div class="cal" id="cal-artist"></div></div>
     </section>
     <section id="sec-shows" style="scroll-margin-top:16px">
@@ -620,25 +647,52 @@ function renderHero(el,filter){
     </div>`;
 }
 
-function renderCal(el,filterArtist){
+/* 12 months from this month (Taiwan date). The chosen month is kept per calendar key so the 60 s refresh keeps it. */
+const calSel={}, calMore={}, CAL_DAYS=6;
+function renderCal(el,filterArtist,key){
   const now=Date.now(), todayTW=twDate(new Date(now).toISOString());
-  const t=new Date(todayTW+"T00:00:00Z"), dow=(t.getUTCDay()+6)%7, start=new Date(t.getTime()-dow*864e5);
   const evs={}, add=(d,o)=>{(evs[d]=evs[d]||[]).push(o)};
+  const when=s=>isJST(s)?`${s.slice(11,16)} 日本／台灣 ${tw(s).slice(6)}`:`${tw(s).slice(6)} 台灣`;
   PHASES.filter(p=>filterArtist(p.a)&&!p.cancelled).forEach(p=>{
-    const a=ARTISTS[p.a];
-    if(p.kind==="point") add(twDate(p.at),{a,txt:`${a.short} ${p.name}`});
-    if(p.kind==="range"){ add(twDate(p.start),{a,txt:`${a.short} 開始`}); if(p.end) add(twDate(p.end),{a,txt:`${a.short} 截止`}); if(p.result) add(twDate(p.result),{a,txt:`${a.short} 結果`}); }
+    const a=ARTISTS[p.a], ev=(s,tag,cls)=>add(twDate(s),{a,tag,cls,t:ms(s),name:p.name,sub:`${when(s)}・${p.tour}`});
+    if(p.kind==="point") ev(p.at,"開賣","st-soon");
+    if(p.kind==="range"){ ev(p.start,"開始","st-open"); if(p.end) ev(p.end,"截止","st-soon"); if(p.result) ev(p.result,"結果","st-wait"); }
   });
-  TOURS.filter(x=>filterArtist(x.a)).forEach(x=>x.shows.forEach(s=>add(s[0],{a:ARTISTS[x.a],txt:s[1],cls:"show"})));
-  let html=["一","二","三","四","五","六","日"].map(d=>`<div class="dow">${d}</div>`).join("");
-  for(let i=0;i<35;i++){
-    const d=new Date(start.getTime()+i*864e5).toISOString().slice(0,10), p=parts(d);
-    const list=(evs[d]||[]).sort((x,y)=>(x.cls==="show")-(y.cls==="show")), shown=list.slice(0,3), more=list.length-shown.length;
-    html+=`<div class="day ${d<todayTW?"old":""} ${d===todayTW?"today":""}" title="${list.map(e=>e.a.name+" "+e.txt).join("\n")}">
-      <div class="n"><span>${p.d===1||i===0?`${p.m}/${p.d}`:p.d}</span>${more>0?`<span>+${more}</span>`:""}</div>
-      ${shown.map(e=>`<div class="ev ${e.cls||""}" style="--a:var(${e.a.color})">${e.txt}</div>`).join("")}</div>`;
-  }
-  el.innerHTML=html;
+  TOURS.filter(x=>filterArtist(x.a)).forEach(x=>x.shows.forEach(s=>add(s[0],{a:ARTISTS[x.a],tag:"演出",cls:"show",t:Infinity,name:`${s[1]}・${s[2]}`,sub:x.title})));
+  const [ty,tm]=todayTW.split("-").map(Number);
+  const months=[...Array(12)].map((_,i)=>{ const d=new Date(Date.UTC(ty,tm-1+i,1)); return {y:d.getUTCFullYear(),m:d.getUTCMonth()+1,k:d.toISOString().slice(0,7)}; });
+  const sel=months.some(M=>M.k===calSel[key])?calSel[key]:months[0].k;
+  const dws=["一","二","三","四","五","六","日"].map(d=>`<span class="dw">${d}</span>`).join("");
+  const yr=months.map(M=>{
+    const lead=(new Date(Date.UTC(M.y,M.m-1,1)).getUTCDay()+6)%7, days=new Date(Date.UTC(M.y,M.m,0)).getUTCDate();
+    let n=0, cells="<span></span>".repeat(lead);
+    for(let d=1;d<=days;d++){
+      const k=`${M.k}-${pad(d)}`, l=evs[k]||[]; n+=l.length;
+      cells+=`<span data-day="${k}" class="${l.length?"on":""} ${k<todayTW?"old":""} ${k===todayTW?"now":""}"${l.length?` style="--a:var(${l[0].a.color})"`:""}>${d}</span>`;
+    }
+    return `<button type="button" class="mm ${n?"":"empty"}" data-month="${M.k}" aria-pressed="${M.k===sel}" aria-label="${M.y} 年 ${M.m} 月，${n} 件">
+      <span class="mm-h">${M.y!==ty?`${M.y}/`:""}${M.m} 月<small class="${n?"has":""}">${n?`${n} 件`:"無"}</small></span><span class="mm-g">${dws}${cells}</span></button>`;
+  }).join("");
+  const [sy,sm]=sel.split("-").map(Number);
+  let keys=Object.keys(evs).filter(k=>k.startsWith(sel)&&k>=todayTW).sort();
+  const hidden=calMore[key+sel]?0:Math.max(0,keys.length-CAL_DAYS); if(hidden) keys=keys.slice(0,CAL_DAYS);
+  const ag=keys.map(k=>{
+    const p=parts(k), l=evs[k].sort((x,y)=>x.t-y.t);
+    return `<div class="ag-day ${k<todayTW?"old":""} ${k===todayTW?"now":""}" id="${el.id}-${k}">
+      <div class="ag-d"><b>${p.m}/${p.d}</b><span>週${p.wd}${k===todayTW?"・今天":""}</span></div>
+      <div class="ag-list">${l.map(e=>`<div class="ag-ev" style="--a:var(${e.a.color})"><i></i><div><em class="tg ${e.cls}">${e.tag}</em><b>${e.a.name}</b>${e.name}</div><span>${e.sub}</span></div>`).join("")}</div></div>`;
+  }).join("")||`<p class="note">${sy} 年 ${sm} 月${sel===months[0].k?"接下來":"目前"}沒有售票或演出。</p>`;
+  el.innerHTML=`<div class="yr">${yr}</div><div><h3 class="ag-h">${sy} 年 ${sm} 月${sel===months[0].k?" <small>今天以後</small>":""}</h3>${ag}
+    ${hidden?`<button class="toggle" type="button" data-more>顯示這個月其餘 ${hidden} 天</button>`:""}</div>`;
+  el.onclick=e=>{
+    if(e.target.closest("[data-more]")){ calMore[key+sel]=true; renderCal(el,filterArtist,key); return; }
+    const mm=e.target.closest("[data-month]"); if(!mm) return;
+    const day=e.target.closest("[data-day]");
+    calSel[key]=mm.dataset.month; if(day) calMore[key+mm.dataset.month]=true; renderCal(el,filterArtist,key);
+    const t=day&&$(`${el.id}-${day.dataset.day}`);
+    if(t){ t.classList.add("hit"); t.scrollIntoView({block:"start",behavior:"smooth"}); }
+    else el.querySelector(".ag-h").scrollIntoView({block:"nearest",behavior:"smooth"});
+  };
 }
 
 /* One card per artist + tour: phases close in time for the same shows are listed together inside it. */
@@ -731,7 +785,7 @@ function renderArtist(k){
     <div class="links">${links}</div>`;
   renderHero($("hero-artist"),p=>p.a===k);
   renderTickets($("tickets-artist"),p=>p.a===k);
-  renderCal($("cal-artist"),x=>x===k);
+  renderCal($("cal-artist"),x=>x===k,k);
   const today=japanToday();
   $("tours-artist").innerHTML=TOURS.filter(t=>t.a===k).map(t=>{
     const ni=t.shows.findIndex(x=>x[0]>=today);
@@ -752,7 +806,7 @@ function route(key){
     document.title=`${ARTISTS[k].name}｜日系演唱會搶票表`;
   }else{
     $("artist").hidden=true; $("home").hidden=false;
-    renderRail($("rail-home"),null); renderHero($("hero-home"),()=>true); renderCal($("cal-home"),()=>true); renderTickets($("tickets-home"),p=>!p.homeHide); renderUpNext();
+    renderRail($("rail-home"),null); renderHero($("hero-home"),()=>true); renderCal($("cal-home"),()=>true,"home"); renderTickets($("tickets-home"),p=>!p.homeHide); renderUpNext();
     document.title="日系演唱會搶票表";
   }
 }
