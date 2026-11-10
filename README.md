@@ -25,7 +25,10 @@ cat head.html page.html > index.html
 
 ## 自動更新
 
-Claude 桌面 app 的排程每天台灣時間 9:00、11:30、17:30、20:30 會核對各歌手官方公告，有變更就更新 `page.html`、重新產生 `index.html`，commit 並推上 GitHub，GitHub Pages 會自動重新部署。
+家裡 Mac 上的 Claude 桌面 app 排程，每天台灣時間 9:00、11:30、17:30、20:30 會核對各歌手官方公告。有變更就更新 `page.html`、重新產生 `index.html`，commit 並推上 GitHub，GitHub Pages 會自動重新部署。
+
+- 設定步驟：[automation/SETUP-MAC.md](automation/SETUP-MAC.md)
+- 排程指令：[automation/update-prompt.md](automation/update-prompt.md)
 
 - 首頁：歌手海報、下一個要搶的票（倒數）、近五週行事曆、搶票清單、接下來的演出
 - 點歌手海報進入個人頁（網址會變成 `index.html#yonezu` 這種形式，可以收藏）
