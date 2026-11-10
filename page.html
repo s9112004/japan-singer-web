@@ -9,7 +9,7 @@
 :root{
   --bg:#e9edf3; --card:#ffffff; --ink:#1a2030; --muted:#5f6880; --line:#d3d9e3; --soft:#f2f4f8;
   --open:#0d8a57; --soon:#d6264a; --wait:#b36a00; --tba:#4a5a7a; --past:#9aa2b3;
-  --c-yonezu:#2f56d9; --c-kinggnu:#c3202c; --c-suisei:#1192d6; --c-yoasobi:#d0288b; --c-zutomayo:#6b3ad0; --c-hisaishi:#0c8a74; --c-fujii:#c2620a; --c-vaundy:#4f8a10; --c-tuki:#9a7400;
+  --c-yonezu:#2f56d9; --c-kinggnu:#c3202c; --c-suisei:#1192d6; --c-yoasobi:#d0288b; --c-zutomayo:#6b3ad0; --c-hisaishi:#0c8a74; --c-fujii:#c2620a; --c-vaundy:#4f8a10; --c-tuki:#9a7400; --c-iu:#a0329c;
   --poster-base:#101218; --poster-ink:#ffffff;
   --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
   --f-disp:"Dela Gothic One","Noto Sans TC",system-ui,sans-serif;
@@ -18,11 +18,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0f131b; --card:#1a202c; --ink:#e9edf5; --muted:#99a3b8; --line:#2c3445; --soft:#222938;
   --open:#3fd896; --soon:#ff5c7a; --wait:#ffb547; --tba:#a6b6d8; --past:#5d667a;
-  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; color-scheme:dark}}
+  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; --c-iu:#e98ae2; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0f131b; --card:#1a202c; --ink:#e9edf5; --muted:#99a3b8; --line:#2c3445; --soft:#222938;
   --open:#3fd896; --soon:#ff5c7a; --wait:#ffb547; --tba:#a6b6d8; --past:#5d667a;
-  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; color-scheme:dark}
+  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; --c-iu:#e98ae2; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 72px}
@@ -313,7 +313,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
     </section>
   </div>
 
-  <footer>資料整理於 2026-11-10（米津玄師、King Gnu、星街すいせい、YOASOBI、ずっと真夜中でいいのに。、久石讓、藤井風、Vaundy、tuki.），來源是官方網站、官方 FC、新聞和售票整理網站。標「待確認」的只有第三方資料，申請前請到官方網站再確認。日本時間（JST）比台灣快 1 小時，日本的時間都附上台灣時間。</footer>
+  <footer>資料整理於 2026-11-10（米津玄師、King Gnu、星街すいせい、YOASOBI、ずっと真夜中でいいのに。、久石讓、藤井風、Vaundy、tuki.、IU），來源是官方網站、官方 FC、新聞和售票整理網站。標「待確認」的只有第三方資料，申請前請到官方網站再確認。日本時間（JST）比台灣快 1 小時，日本的時間都附上台灣時間。</footer>
 </div>
 
 <script>
@@ -327,6 +327,7 @@ const ARTISTS = {
   fujii:   {name:"藤井風", jp:"FUJII KAZE", short:"藤井風", mark:"F", color:"--c-fujii", site:["官方網站","https://fujiikaze.com/"], fc:["巡演官方頁","https://hehn.fujiikaze.com/pwt/"]},
   vaundy:  {name:"Vaundy", jp:"バウンディ", short:"Vaundy", mark:"V", color:"--c-vaundy", site:["官方網站","https://vaundy.jp/"], fc:["FC VAWS 巡演頁","https://member.vaundy.jp/feature/ARENATOUR_2728?lang=ja"]},
   tuki:    {name:"tuki.", jp:"TUKI", short:"tuki.", mark:"T", color:"--c-tuki", site:["官方網站","https://tuki-official.net/"]},
+  iu:      {name:"IU", jp:"아이유", short:"IU", mark:"I", color:"--c-iu", site:["經紀公司 EDAM","https://www.edam-ent.com/"], fc:["EDAM 公告","https://www.edam-ent.com/html/sub02/sub02_0201.php?vType=list&bbsCode=b_notice02&page=1"]},
 };
 
 /* kind: range = 受付期間（end 可省略＝截止未公布） / point = 單一時間點 / tba = 尚未公布 */
@@ -422,6 +423,7 @@ const PHASES = [
   {a:"suisei", tid:"suisei-bansan", homeHide:true, tour:"星降る晩餐会 tuki. × 星街すいせい", name:"一般發售（先着）", kind:"range", start:"2026-10-31T10:00+09:00", end:"2026-12-19T23:59+09:00", memo:"e+・和 tuki. 的合演，FC 先行已結束"},
   {a:"tuki", tid:"tuki-fes", city:"大阪", tour:"FM802 RADIO CRAZY 2026", name:"官方第 5 次抽選＋ぴあ／ローチケ抽選", kind:"range", start:"2026-11-06T00:00+09:00", end:"2026-11-15T23:59+09:00", memo:"音樂祭票・ぴあ到 11/16、ローチケ到 11/17・海外可用 e+ 國際先着"},
   {a:"tuki", tid:"tuki-fes", city:"千葉", tour:"COUNTDOWN JAPAN 26/27", name:"官方轉售（抽選配對）", kind:"range", start:"2026-12-07T16:00+09:00", end:"2026-12-14T16:00+09:00", memo:"音樂祭票全日售完・只能透過官方轉售，禁止私下轉讓"},
+  {a:"iu", tid:"iu-goyang", tour:"高陽綜合運動場 單獨演唱會", name:"演唱會售票", kind:"tba", cancelled:true, memo:"7/20 IU 因耳咽管開放症惡化宣布取消・新的演出日期還沒公布"},
 ];
 
 const TOURS = [
@@ -491,6 +493,9 @@ const TOURS = [
   {id:"tuki-fes", a:"tuki", title:"tuki. 音樂祭演出", facts:[["大阪","RADIO CRAZY 1DAY ¥13,500"],["千葉","COUNTDOWN JAPAN（已售完）"]],
    shows:[["2026-12-26","大阪","FM802 RADIO CRAZY 2026・インテックス大阪"],["2026-12-29","千葉","COUNTDOWN JAPAN 26/27・幕張メッセ"]],
    note:"音樂祭票是整天的票，tuki. 的演出時段還沒公布。CDJ 是她第一次上音樂祭。"},
+  {id:"iu-goyang", a:"iu", title:"IU 高陽綜合運動場 單獨演唱會（已取消）", facts:[["韓國","高陽綜合運動場 主競技場"],["原訂","2026 年 9 月（日期未公開）"],["狀態","已取消"]],
+   shows:[],
+   note:"3/27 公布 9 月在高陽體育場開唱，7/20 IU 因耳咽管開放症惡化取消，第 6 張正規專輯也延後。IU 說最晚 2027 年初回歸，經紀公司 EDAM 表示新的演出日期會另行公告，目前（11/10）還沒有任何場次或售票資訊。"},
 ];
 
 const SOURCES = {
@@ -503,6 +508,7 @@ const SOURCES = {
   fujii:[["Prema World Tour 官方","https://hehn.fujiikaze.com/pwt/"],["鋼琴獨奏會官方","https://hehn.fujiikaze.com/fpr/"],["官方消息（一般抽選）","https://fujiikaze.com/news-article/news260421/"],["官方消息（2 次抽選）","https://fujiikaze.com/news-article/news260810/"],["e+ 大阪轉讓","https://eplus.jp/fujiikaze2026/trade-osaka/"],["e+ 東京轉讓","https://eplus.jp/fujiikaze2026/trade-tokyo/"],["KKTIX 高雄","https://kklivetw.kktix.cc/events/34473ba4"],["Melon 首爾","https://tkglobal.melon.com/performance/index.htm?langCd=EN&prodId=213396"],["LIGNEA","https://lignea.co.jp/fujiikaze-ticket/"]],
   vaundy:[["官方消息（千葉追加場）","https://vaundy.jp/news/detail/11145"],["FC 巡演頁","https://member.vaundy.jp/feature/ARENATOUR_2728?lang=ja"],["FC 追加場受付","https://member.vaundy.jp/news/detail/11328"],["HORO 巡演頁","https://member.vaundy.jp/feature/ASIAARENATOUR_2026"]],
   tuki:[["官方巡演消息","https://tuki-official.net/contents/1094029"],["e+ 巡演","https://eplus.jp/tuki.2026/"],["星降る晩餐会 官方","https://tuki-official.net/contents/1104832"],["e+ 星降る晩餐会","https://eplus.jp/hoshifuru_bansankai/"],["RADIO CRAZY 出演","https://tuki-official.net/contents/1125635"],["RADIO CRAZY 售票","https://radiocrazy.fm/ticket/"],["CDJ 出演","https://tuki-official.net/contents/1118768"],["CDJ 售票","https://countdownjapan.jp/2627/ticket/"]],
+  iu:[["EDAM 公告","https://www.edam-ent.com/html/sub02/sub02_0201.php?vType=list&bbsCode=b_notice02&page=1"],["Dispatch：9 月高陽開唱","https://www.dispatch.co.kr/2340577"],["Daum：取消演唱會","https://v.daum.net/v/20260721071809924?f=p"],["Nate：2027 年初回歸","https://m.news.nate.com/view/20260720n34781"]],
 };
 
 const WD=["日","一","二","三","四","五","六"];

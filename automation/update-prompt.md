@@ -6,7 +6,7 @@
 
 你要更新「日系演唱會搶票表」。專案是這個 git repo（就是這份檔案所在的 repo），網站由 GitHub Pages 從 `main` 分支部署：https://s9112004.github.io/japan-singer-web/
 
-使用者在台灣，用繁體中文。頁面整理這些歌手的演出日期與售票時程：米津玄師(yonezu)、King Gnu(kinggnu)、星街すいせい(suisei)、YOASOBI(yoasobi)、ずっと真夜中でいいのに。(zutomayo)、久石讓(hisaishi)、藤井風(fujii)、Vaundy(vaundy)、tuki.(tuki)。
+使用者在台灣，用繁體中文。頁面整理這些歌手的演出日期與售票時程：米津玄師(yonezu)、King Gnu(kinggnu)、星街すいせい(suisei)、YOASOBI(yoasobi)、ずっと真夜中でいいのに。(zutomayo)、久石讓(hisaishi)、藤井風(fujii)、Vaundy(vaundy)、tuki.(tuki)、IU(iu，韓國歌手)。
 
 ## 帳號規則
 
@@ -24,6 +24,8 @@
    用網路搜尋（日文、繁中、英文）和讀網頁。來源優先順序：官方網站、官方 FC、官方 X 帳號、官方售票網站（e+、ぴあ、ローチケ、遠大、KKTIX）> 新聞 > 部落格／整理網站。
 
    官方網站：vaundy.jp、member.vaundy.jp、clubgnu.com、sonymusic.co.jp/artist/kinggnu、hoshimachi-suisei-fc.jp、hoshimachi-suisei.jp、yoasobi-music.jp（是 JS 頁，可改讀 https://www.sonymusic.co.jp/json/v2/artist/YOASOBI/information/start/0/count/100/callback/InfoCallcack）、zutomayo.net/apicula/、joehisaishi.com、hehn.fujiikaze.com/pwt/、fujiikaze.com、tuki-official.net（tuki-official.com 不是她的）、reissuerecords.net（米津）、ticket.kenshiyonezu.jp。
+
+   IU：經紀公司 EDAM 公告 https://www.edam-ent.com/html/sub02/sub02_0201.php?vType=list&bbsCode=b_notice02&page=1 、Melon Ticket（tkglobal.melon.com 國際版）、Interpark／NOL Ticket、韓文新聞（搜「아이유 콘서트」「아이유 티켓 예매」）。2026 年 9 月高陽場已取消（`cancelled:true`），IU 說最晚 2027 年初回歸；有新巡演、台灣場或售票（선예매／일반예매）公布時新增 `TOURS` 和 `PHASES`，時間用韓國時間 `+09:00`（與日本相同）。
 
 3. 只改 `page.html` 裡 `<script>` 的資料，不要改版面設計：
    - `PHASES`：每筆售票 `{a, tour, name, kind:"range"|"point"|"tba", start, end(可省略=截止未公布), result, at, memo, unverified:true(只有第三方來源), cancelled:true(確定不舉辦), tid/city/dates(對應場次), url(售票頁), homeHide:true(合演在兩位歌手都有時，首頁只顯示一次)}`。時間一律寫成帶時區的字串：日本 `+09:00`、台灣 `+08:00`。
