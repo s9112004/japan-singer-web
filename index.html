@@ -97,24 +97,31 @@ section{display:grid;gap:14px;min-width:0}
 .flag{font-size:11.5px;font-weight:700;color:var(--wait);border:1px dashed var(--wait);border-radius:4px;padding:0 6px;white-space:nowrap}
 .pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:var(--s);background:color-mix(in srgb,var(--s) 14%,transparent)}
 
-/* calendar: 12 mini months to scan the year, then a readable list for the chosen month */
+/* calendar: one month at a time with ‹ › arrows (12 months from now), then a readable list for that month */
 .cal-wrap{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--line)}
-.cal{display:grid;gap:18px}
-.yr{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.mm{all:unset;box-sizing:border-box;cursor:pointer;display:grid;align-content:start;gap:6px;padding:10px;border-radius:12px;background:var(--soft);border:2px solid transparent;min-width:0;font:inherit;color:inherit;text-align:left}
-.mm:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.mm[aria-pressed="true"]{border-color:var(--ink);background:var(--card)}
-.mm.empty .mm-g{opacity:.5}
-.mm-h{display:flex;justify-content:space-between;align-items:baseline;gap:6px;font-weight:900;font-size:15px}
-.mm-h small{font-size:12.5px;font-weight:700;color:var(--muted)}
-.mm-h small.has{color:var(--ink)}
-.mm-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.mm-g span{aspect-ratio:1;display:grid;place-items:center;font-family:var(--f-mono);font-size:11px;color:var(--muted);border-radius:50%;min-width:0}
-.mm-g .dw{aspect-ratio:auto;font-family:var(--f-body);font-size:10px;font-weight:700}
-.mm-g .on{background:var(--a);color:var(--card);font-weight:600}
+.cal{display:grid;gap:18px;grid-template-columns:minmax(0,340px) minmax(0,1fr);align-items:start}
+.mpick{display:grid;gap:10px}
+.mnav{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px}
+.mnav button{all:unset;box-sizing:border-box;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:var(--soft);border:1px solid var(--line);font-size:22px;font-weight:700;line-height:1;color:var(--ink)}
+.mnav button:hover:not(:disabled){background:var(--line)}
+.mnav button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.mnav button:disabled{opacity:.3;cursor:default}
+.mnav-t{text-align:center;display:grid;line-height:1.25}
+.mnav-t b{font-size:19px;font-weight:900}
+.mnav-t small{font-size:12.5px;color:var(--muted)}
+.mnav-t small.has{color:var(--ink);font-weight:700}
+.mnav-t .today-btn{all:unset;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--soon);text-decoration:underline}
+.mm-g{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;touch-action:pan-y}
+.mm-g span{aspect-ratio:1;display:grid;place-items:center;font-family:var(--f-mono);font-size:14px;color:var(--muted);border-radius:50%;min-width:0}
+.mm-g .dw{aspect-ratio:auto;font-family:var(--f-body);font-size:12px;font-weight:700;padding-bottom:2px}
+.mm-g .on{background:var(--a);color:var(--card);font-weight:600;cursor:pointer}
 .mm-g .old{opacity:.4}
 .mm-g .now{box-shadow:0 0 0 2px var(--ink);color:var(--ink);font-weight:600}
 .mm-g .on.now{color:var(--card)}
+.mdots{display:flex;justify-content:center;gap:6px}
+.mdots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.mdots i.has{background:var(--muted)}
+.mdots i.cur{background:var(--ink);width:16px;border-radius:3px}
 .ag-h{margin:0 0 4px;font-size:18px;font-weight:900}
 .ag-h small{font-size:13px;font-weight:500;color:var(--muted)}
 .cal .toggle{margin-top:10px}
@@ -246,7 +253,7 @@ tr.next td.c::after{content:"NEXT";font-family:var(--f-mono);font-size:10px;font
 .srcs{font-size:13px;color:var(--muted);display:flex;gap:6px 16px;flex-wrap:wrap}
 footer{font-size:12.5px;color:var(--muted);max-width:70ch}
 
-@media (max-width:860px){ .yr{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:860px){ .cal{grid-template-columns:minmax(0,1fr)} .mpick{max-width:420px;width:100%;justify-self:center} }
 @media (max-width:620px){
   .ticket{grid-template-columns:1fr}
   .ticket .stub{border-left:0;border-top:2px dashed var(--line);grid-template-columns:auto auto 1fr;justify-items:start;align-items:center;text-align:left;padding:12px 16px 12px 22px;gap:4px 14px}
@@ -256,9 +263,6 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
   .stub .big{font-size:26px}
   .stub .gc{justify-self:end}
   .cal-wrap{padding:12px}
-  .yr{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .mm{padding:8px}
-  .mm-g span{font-size:12px}
   .ag-day{grid-template-columns:52px 1fr;gap:10px;padding:12px 4px}
   .ag-d b{font-size:18px}
   .poster{flex-basis:148px;height:200px}
@@ -284,7 +288,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
     </section>
     <section class="hero" id="hero-home" aria-live="polite"></section>
     <section>
-      <h2>近一年行事曆 <small>色塊＝當天有售票或演出，點月份或日期看清單</small></h2>
+      <h2>近一年行事曆 <small>按 ‹ › 換月份，點色塊日期看當天</small></h2>
       <div class="cal-wrap"><div class="cal" id="cal-home"></div></div>
     </section>
     <section>
@@ -309,7 +313,7 @@ footer{font-size:12.5px;color:var(--muted);max-width:70ch}
       <button class="toggle" type="button" data-past>顯示已結束的售票</button>
     </section>
     <section>
-      <h2>近一年行事曆 <small>點月份或日期看清單</small></h2>
+      <h2>近一年行事曆 <small>按 ‹ › 換月份，點色塊日期看當天</small></h2>
       <div class="cal-wrap"><div class="cal" id="cal-artist"></div></div>
     </section>
     <section id="sec-shows" style="scroll-margin-top:16px">
@@ -681,18 +685,26 @@ function renderCal(el,filterArtist,key){
   const [ty,tm]=todayTW.split("-").map(Number);
   const months=[...Array(12)].map((_,i)=>{ const d=new Date(Date.UTC(ty,tm-1+i,1)); return {y:d.getUTCFullYear(),m:d.getUTCMonth()+1,k:d.toISOString().slice(0,7)}; });
   const sel=months.some(M=>M.k===calSel[key])?calSel[key]:months[0].k;
+  const idx=months.findIndex(M=>M.k===sel), M=months[idx];
+  const cnt=k=>Object.keys(evs).filter(d=>d.startsWith(k)).reduce((n,d)=>n+evs[d].length,0);
   const dws=["一","二","三","四","五","六","日"].map(d=>`<span class="dw">${d}</span>`).join("");
-  const yr=months.map(M=>{
-    const lead=(new Date(Date.UTC(M.y,M.m-1,1)).getUTCDay()+6)%7, days=new Date(Date.UTC(M.y,M.m,0)).getUTCDate();
-    let n=0, cells="<span></span>".repeat(lead);
-    for(let d=1;d<=days;d++){
-      const k=`${M.k}-${pad(d)}`, l=evs[k]||[]; n+=l.length;
-      cells+=`<span data-day="${k}" class="${l.length?"on":""} ${k<todayTW?"old":""} ${k===todayTW?"now":""}"${l.length?` style="--a:var(${l[0].a.color})"`:""}>${d}</span>`;
-    }
-    return `<button type="button" class="mm ${n?"":"empty"}" data-month="${M.k}" aria-pressed="${M.k===sel}" aria-label="${M.y} 年 ${M.m} 月，${n} 件">
-      <span class="mm-h">${M.y!==ty?`${M.y}/`:""}${M.m} 月<small class="${n?"has":""}">${n?`${n} 件`:"無"}</small></span><span class="mm-g">${dws}${cells}</span></button>`;
-  }).join("");
-  const [sy,sm]=sel.split("-").map(Number);
+  const lead=(new Date(Date.UTC(M.y,M.m-1,1)).getUTCDay()+6)%7, days=new Date(Date.UTC(M.y,M.m,0)).getUTCDate();
+  let cells="<span></span>".repeat(lead);
+  for(let d=1;d<=days;d++){
+    const k=`${M.k}-${pad(d)}`, l=evs[k]||[];
+    cells+=`<span ${l.length?`data-day="${k}" role="button" tabindex="0" aria-label="${M.m}/${d}，${l.length} 件" style="--a:var(${l[0].a.color})"`:""} class="${l.length?"on":""} ${k<todayTW?"old":""} ${k===todayTW?"now":""}">${d}</span>`;
+  }
+  const n=cnt(M.k);
+  const pick=`<div class="mpick">
+    <div class="mnav">
+      <button type="button" data-step="-1" ${idx===0?"disabled":""} aria-label="上個月">‹</button>
+      <div class="mnav-t" aria-live="polite"><b>${M.y} 年 ${M.m} 月</b>${idx?`<button type="button" class="today-btn" data-step="${-idx}">回到本月</button>`:`<small class="${n?"has":""}">${n?`${n} 件`:"沒有活動"}</small>`}</div>
+      <button type="button" data-step="1" ${idx===months.length-1?"disabled":""} aria-label="下個月">›</button>
+    </div>
+    <div class="mm-g">${dws}${cells}</div>
+    <div class="mdots" aria-hidden="true">${months.map((X,i)=>`<i class="${i===idx?"cur":""} ${cnt(X.k)?"has":""}"></i>`).join("")}</div>
+  </div>`;
+  const [sy,sm]=[M.y,M.m];
   let keys=Object.keys(evs).filter(k=>k.startsWith(sel)&&k>=todayTW).sort();
   const hidden=calMore[key+sel]?0:Math.max(0,keys.length-CAL_DAYS); if(hidden) keys=keys.slice(0,CAL_DAYS);
   const ag=keys.map(k=>{
@@ -700,18 +712,22 @@ function renderCal(el,filterArtist,key){
     return `<div class="ag-day ${k<todayTW?"old":""} ${k===todayTW?"now":""}" id="${el.id}-${k}">
       <div class="ag-d"><b>${p.m}/${p.d}</b><span>週${p.wd}${k===todayTW?"・今天":""}</span></div>
       <div class="ag-list">${l.map(e=>`<div class="ag-ev" style="--a:var(${e.a.color})"><i></i><div><em class="tg ${e.cls}">${e.tag}</em><b>${e.a.name}</b>${e.name}</div><span>${e.sub}</span></div>`).join("")}</div></div>`;
-  }).join("")||`<p class="note">${sy} 年 ${sm} 月${sel===months[0].k?"接下來":"目前"}沒有售票或演出。</p>`;
-  el.innerHTML=`<div class="yr">${yr}</div><div><h3 class="ag-h">${sy} 年 ${sm} 月${sel===months[0].k?" <small>今天以後</small>":""}</h3>${ag}
+  }).join("")||`<p class="note">${sy} 年 ${sm} 月${idx===0?"接下來":"目前"}沒有售票或演出。</p>`;
+  el.innerHTML=`${pick}<div><h3 class="ag-h">${sy} 年 ${sm} 月${idx===0?" <small>今天以後</small>":""}</h3>${ag}
     ${hidden?`<button class="toggle" type="button" data-more>顯示這個月其餘 ${hidden} 天</button>`:""}</div>`;
+  const step=d=>{ const j=Math.min(months.length-1,Math.max(0,idx+d)); if(j===idx) return; calSel[key]=months[j].k; renderCal(el,filterArtist,key); };
+  const openDay=k=>{ calMore[key+sel]=true; renderCal(el,filterArtist,key);
+    const t=$(`${el.id}-${k}`); if(t){ t.classList.add("hit"); t.scrollIntoView({block:"start",behavior:"smooth"}); } };
   el.onclick=e=>{
     if(e.target.closest("[data-more]")){ calMore[key+sel]=true; renderCal(el,filterArtist,key); return; }
-    const mm=e.target.closest("[data-month]"); if(!mm) return;
-    const day=e.target.closest("[data-day]");
-    calSel[key]=mm.dataset.month; if(day) calMore[key+mm.dataset.month]=true; renderCal(el,filterArtist,key);
-    const t=day&&$(`${el.id}-${day.dataset.day}`);
-    if(t){ t.classList.add("hit"); t.scrollIntoView({block:"start",behavior:"smooth"}); }
-    else el.querySelector(".ag-h").scrollIntoView({block:"nearest",behavior:"smooth"});
+    const b=e.target.closest("[data-step]"); if(b){ step(+b.dataset.step); return; }
+    const day=e.target.closest("[data-day]"); if(day) openDay(day.dataset.day);
   };
+  el.onkeydown=e=>{ const day=e.target.closest&&e.target.closest("[data-day]"); if(day&&(e.key==="Enter"||e.key===" ")){ e.preventDefault(); openDay(day.dataset.day); } };
+  /* swipe left/right on the month grid */
+  const g=el.querySelector(".mm-g"); let x0=null;
+  g.ontouchstart=e=>{ x0=e.touches[0].clientX; };
+  g.ontouchend=e=>{ if(x0===null) return; const dx=e.changedTouches[0].clientX-x0; x0=null; if(Math.abs(dx)>50) step(dx<0?1:-1); };
 }
 
 /* One card per artist + tour: phases close in time for the same shows are listed together inside it. */
