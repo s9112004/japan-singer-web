@@ -1,0 +1,779 @@
+<meta charset="utf-8">
+<title>日系演唱會搶票表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: poster rail of artists (tap = artist page), a big countdown, a 5-week calendar, paper-ticket stubs, then shows.
+   Each artist has its own page at #<artist>, built from the same parts filtered to that artist. */
+:root{
+  --bg:#e9edf3; --card:#ffffff; --ink:#1a2030; --muted:#5f6880; --line:#d3d9e3; --soft:#f2f4f8;
+  --open:#0d8a57; --soon:#d6264a; --wait:#b36a00; --tba:#4a5a7a; --past:#9aa2b3;
+  --c-yonezu:#2f56d9; --c-kinggnu:#c3202c; --c-suisei:#1192d6; --c-yoasobi:#d0288b; --c-zutomayo:#6b3ad0; --c-hisaishi:#0c8a74; --c-fujii:#c2620a; --c-vaundy:#4f8a10; --c-tuki:#9a7400;
+  --poster-base:#101218; --poster-ink:#ffffff;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --f-disp:"Dela Gothic One","Noto Sans TC",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f131b; --card:#1a202c; --ink:#e9edf5; --muted:#99a3b8; --line:#2c3445; --soft:#222938;
+  --open:#3fd896; --soon:#ff5c7a; --wait:#ffb547; --tba:#a6b6d8; --past:#5d667a;
+  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f131b; --card:#1a202c; --ink:#e9edf5; --muted:#99a3b8; --line:#2c3445; --soft:#222938;
+  --open:#3fd896; --soon:#ff5c7a; --wait:#ffb547; --tba:#a6b6d8; --past:#5d667a;
+  --c-yonezu:#7894ff; --c-kinggnu:#ff6670; --c-suisei:#55c3ff; --c-yoasobi:#ff6fc3; --c-zutomayo:#a988ff; --c-hisaishi:#4cd3bd; --c-fujii:#ffad5a; --c-vaundy:#a5dc5c; --c-tuki:#f0cb4b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 72px}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.wrap{max-width:1000px;margin:0 auto;display:grid;gap:30px}
+.view{display:grid;gap:30px}
+h2{margin:0;font-size:20px;font-weight:900;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 small{font-size:13px;font-weight:500;color:var(--muted)}
+section{display:grid;gap:14px;min-width:0}
+
+/* top */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.top h1{margin:0;font-weight:900;font-size:clamp(28px,5vw,44px);line-height:1.1;letter-spacing:.02em}
+.top h1 a{text-decoration:none}
+.top h1 span{font-family:var(--f-disp);font-weight:400;font-size:.42em;display:block;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.today{font-size:13px;color:var(--muted);text-align:right}
+.today b{display:block;font-family:var(--f-disp);font-weight:400;font-size:26px;color:var(--ink);line-height:1.1}
+
+/* poster rail */
+.rail{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px;margin:-4px;scrollbar-width:thin}
+.poster{flex:0 0 172px;height:224px;scroll-snap-align:start;border-radius:18px;padding:14px;text-decoration:none;position:relative;overflow:hidden;isolation:isolate;
+  display:flex;flex-direction:column;justify-content:space-between;color:var(--poster-ink);background:var(--poster-base);transition:transform .2s ease}
+.poster::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--a) 90%,transparent),transparent 62%),
+             radial-gradient(90% 70% at 0% 100%,color-mix(in srgb,var(--a) 50%,#000),transparent 72%)}
+.poster::after{content:attr(data-mark);position:absolute;right:-6px;bottom:-34px;z-index:-1;font-family:var(--f-disp);font-size:170px;line-height:1;
+  color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.28)}
+.poster .tag{font-size:12px;font-weight:700;background:rgba(0,0,0,.38);border-radius:999px;padding:3px 10px;align-self:flex-start}
+.poster .tag.live{background:#fff;color:#0d0f14}
+.poster .nm{display:block;font-weight:900;font-size:19px;line-height:1.2;text-wrap:balance}
+.poster .sub{display:block;font-size:12px;color:rgba(255,255,255,.78);margin-top:4px}
+.poster .go{display:block;font-size:12px;font-weight:700;margin-top:8px;opacity:.9}
+.poster[aria-current="page"]{box-shadow:0 0 0 3px var(--ink)}
+.rail.compact .poster{flex-basis:132px;height:120px;padding:10px}
+.rail.compact .poster::after{font-size:96px;bottom:-20px}
+.rail.compact .poster .sub,.rail.compact .poster .go{display:none}
+.rail.compact .poster .nm{font-size:15px}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){.poster:hover{transform:translateY(-3px)}}
+
+/* hero countdown */
+.hero{border-radius:22px;padding:22px;position:relative;overflow:hidden;isolation:isolate;display:grid;gap:16px;background:var(--card);border:1px solid var(--line)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:radial-gradient(70% 120% at 100% 0%,color-mix(in srgb,var(--a) 30%,transparent),transparent 65%)}
+.kicker{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.hero h3{margin:0;font-size:clamp(22px,4vw,32px);font-weight:900;line-height:1.25;text-wrap:balance}
+.hero h3 small{display:block;font-size:14px;font-weight:500;color:var(--muted);margin-top:4px}
+.clock{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.clock .u{display:grid;gap:4px}
+.clock .u b{font-family:var(--f-disp);font-weight:400;font-size:clamp(48px,10vw,88px);line-height:.95;font-variant-numeric:tabular-nums;color:var(--a)}
+.clock .u span{font-size:12px;color:var(--muted);letter-spacing:.06em}
+.clock .sep{font-family:var(--f-disp);font-size:clamp(32px,6vw,56px);line-height:1;color:var(--line);padding-bottom:24px}
+.clock-label{font-size:14px;color:var(--muted)}
+.clock-label b{color:var(--ink)}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:700;text-decoration:none;border:1.5px solid var(--line);background:var(--card);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.flag{font-size:11.5px;font-weight:700;color:var(--wait);border:1px dashed var(--wait);border-radius:4px;padding:0 6px;white-space:nowrap}
+.pill{font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;color:var(--s);background:color-mix(in srgb,var(--s) 14%,transparent)}
+
+/* calendar */
+.cal-wrap{background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--line);overflow-x:auto}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(44px,1fr));gap:4px;min-width:330px}
+.cal .dow{font-size:12px;color:var(--muted);text-align:center;padding-bottom:4px;font-weight:700}
+.cal .day{min-height:74px;border-radius:8px;background:var(--soft);padding:5px;display:grid;align-content:start;gap:3px;min-width:0}
+.cal .day .n{font-family:var(--f-mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.cal .day.old{opacity:.45}
+.cal .day.today{box-shadow:inset 0 0 0 2px var(--ink)}
+.cal .day.today .n{color:var(--ink);font-weight:600}
+.cal .ev{font-size:11px;line-height:1.25;border-radius:4px;padding:2px 4px;background:color-mix(in srgb,var(--a) 16%,transparent);color:var(--ink);border-left:3px solid var(--a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal .ev.show{background:none;border-left:0;padding-left:0;color:var(--muted);display:flex;gap:4px;align-items:center}
+.cal .ev.show::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--a);flex:none}
+
+/* ticket stubs */
+.tickets{display:grid;gap:14px}
+.ticket{display:grid;grid-template-columns:1fr 168px;background:var(--card);border-radius:12px;position:relative;filter:drop-shadow(0 1px 0 var(--line))}
+.ticket .main{padding:16px 18px 16px 20px;display:grid;gap:8px;min-width:0;border-left:6px solid var(--a);border-radius:12px 0 0 12px}
+.ticket .head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.ticket .artist{font-weight:900;font-size:13px;color:var(--a);letter-spacing:.03em;text-decoration:none}
+.ticket .artist:hover{text-decoration:underline}
+.ticket .tour{font-size:12.5px;color:var(--muted)}
+.ticket .phase{font-size:19px;font-weight:900;line-height:1.3;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:12.5px;margin:0}
+.tl dt{color:var(--muted)}
+.tl dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.tl dd em{font-style:normal;color:var(--muted)}
+.ticket .memo{font-size:13px;color:var(--muted)}
+.showline{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;background:color-mix(in srgb,var(--a) 10%,var(--card));border:1px solid color-mix(in srgb,var(--a) 35%,transparent);border-radius:10px;padding:8px 12px;min-width:0}
+.showline em{font-style:normal;font-size:12px;font-weight:900;color:var(--card);background:var(--a);border-radius:6px;padding:2px 8px;white-space:nowrap;margin-top:1px}
+.showline div{min-width:0;display:grid;gap:1px}
+.showline b{font-size:14.5px;font-family:var(--f-mono);font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.showline span{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.showline span a{color:var(--a);font-weight:700;text-decoration:none;white-space:nowrap}
+.showline.done{background:var(--soft);border-color:var(--line)}
+.showline.done em{background:var(--past)}
+.stub .lbl{font-size:11px;letter-spacing:.08em;margin-bottom:2px}
+.prows{display:grid;gap:0;border-top:1px solid var(--line)}
+.prow{display:grid;gap:3px;padding:10px 0;border-bottom:1px solid var(--line);min-width:0}
+.prow.past{opacity:.55}
+.ph{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ph b{font-size:15.5px;font-weight:900}
+.ph .cnt{font-size:12.5px;font-weight:700;color:var(--s)}
+.pt{font-family:var(--f-mono);font-size:12.5px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.pm{font-size:12.5px;color:var(--muted)}
+.pa{display:flex;gap:12px;flex-wrap:wrap}
+.mini{font-size:12.5px;font-weight:700;color:var(--a);text-decoration:none}
+.mini:hover{text-decoration:underline}
+.plist{list-style:none;margin:2px 0 0;padding:0;display:grid;gap:2px}
+.plist li{display:grid;grid-template-columns:86px 1fr auto;gap:8px;align-items:center;font-size:12.5px;min-width:0}
+.plist li.past{opacity:.5}
+.plist .lw{font-weight:700}
+.plist .lt{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--muted);overflow-wrap:anywhere;min-width:0}
+.plist .pill{font-size:11px;padding:1px 8px}
+.tznote{font-size:12px;color:var(--muted)}
+.buyrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.buy{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:700;text-decoration:none;color:#fff;background:var(--a);border-radius:999px;padding:7px 16px}
+.buy:hover{filter:brightness(1.1)}
+.buy.ghost{background:transparent;color:var(--a);border:1.5px solid var(--a);padding:5px 14px}
+:root[data-theme="dark"] .buy:not(.ghost){color:#10131a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .buy:not(.ghost){color:#10131a}}
+.ticket .stub{border-left:2px dashed var(--line);padding:14px 12px;display:grid;justify-items:center;align-content:center;gap:6px;text-align:center;position:relative}
+.ticket .stub::before,.ticket .stub::after{content:"";position:absolute;left:-11px;width:20px;height:20px;border-radius:50%;background:var(--bg)}
+.ticket .stub::before{top:-10px}
+.ticket .stub::after{bottom:-10px}
+.stub .big{font-family:var(--f-disp);font-size:34px;line-height:1}
+.stub .big small{font-size:15px}
+.stub .sub{font-size:12px;color:var(--muted)}
+.stamp{font-weight:900;font-size:15px;letter-spacing:.12em;color:var(--s);border:2.5px double var(--s);border-radius:6px;padding:2px 10px;transform:rotate(-7deg);margin-block:4px}
+.st-open{--s:var(--open)} .st-soon{--s:var(--soon)} .st-wait{--s:var(--wait)} .st-tba{--s:var(--tba)} .st-past{--s:var(--past)}
+.stub .count{font-size:12.5px;font-weight:700;color:var(--s)}
+.stub .gc{font-size:12px;color:var(--muted)}
+.ticket.past{opacity:.55}
+.toggle{border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;justify-self:start;padding:0}
+.note{font-size:13px;color:var(--muted);margin:0}
+
+/* upcoming shows (home) */
+.upnext{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.upnext a{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);text-decoration:none}
+.upnext a:first-child{border-top:0}
+.upnext a:hover{background:var(--soft)}
+.upnext .d{font-family:var(--f-mono);font-size:13px;font-variant-numeric:tabular-nums}
+.upnext .w{min-width:0}
+.upnext .w b{display:block;font-size:14.5px}
+.upnext .w span{display:block;font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upnext .who{font-size:12.5px;font-weight:700;color:var(--a);display:flex;gap:6px;align-items:center;white-space:nowrap}
+.upnext .who::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--a)}
+
+/* artist page */
+.back{justify-self:start;font-size:14px;font-weight:700;text-decoration:none;color:var(--muted)}
+.back:hover{color:var(--ink)}
+.banner{border-radius:24px;padding:28px 24px 22px;color:var(--poster-ink);background:var(--poster-base);position:relative;overflow:hidden;isolation:isolate;display:grid;gap:14px;min-height:240px;align-content:end}
+.banner::before{content:"";position:absolute;inset:0;z-index:-2;
+  background:radial-gradient(90% 120% at 100% 0%,color-mix(in srgb,var(--a) 90%,transparent),transparent 62%),
+             radial-gradient(70% 90% at 0% 100%,color-mix(in srgb,var(--a) 55%,#000),transparent 72%)}
+.banner::after{content:attr(data-mark);position:absolute;right:10px;top:-40px;z-index:-1;font-family:var(--f-disp);font-size:clamp(200px,34vw,320px);line-height:1;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.25)}
+.banner .jp{font-family:var(--f-disp);font-size:14px;letter-spacing:.1em;opacity:.85}
+.banner h1{margin:0;font-size:clamp(32px,6vw,56px);font-weight:900;line-height:1.1;text-wrap:balance}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{background:rgba(0,0,0,.35);border-radius:12px;padding:8px 14px;display:grid;line-height:1.2}
+.stat b{font-family:var(--f-disp);font-weight:400;font-size:24px}
+.stat span{font-size:12px;opacity:.8}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{font-size:13px;font-weight:700;text-decoration:none;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:6px 14px;color:var(--poster-ink)}
+.links a:hover{background:rgba(255,255,255,.24)}
+
+.tourblock{background:var(--card);border-radius:14px;border:1px solid var(--line);overflow:hidden;--tb:var(--a)}
+.tb-head{padding:14px 18px;display:grid;gap:8px;border-top:4px solid var(--a)}
+.tb-head h4{margin:0;font-size:16.5px;font-weight:900;line-height:1.35}
+.facts{display:flex;gap:6px;flex-wrap:wrap}
+.fact{font-size:12.5px;background:var(--soft);border-radius:999px;padding:3px 10px;color:var(--muted)}
+.fact b{color:var(--ink);font-weight:500}
+.tbl{overflow-x:auto;padding:0 10px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.d{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;width:1%}
+td.c{white-space:nowrap;font-weight:700;width:1%}
+td.v{color:var(--muted)}
+tr.done td{color:var(--past);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--past) 60%,transparent)}
+tr.next td{background:color-mix(in srgb,var(--a) 10%,transparent)}
+tr.next td.c::after{content:"NEXT";font-family:var(--f-mono);font-size:10px;font-weight:600;color:#fff;background:var(--a);border-radius:3px;padding:1px 4px;margin-left:6px;vertical-align:1px}
+.tourblock .note{padding:10px 18px 14px}
+.srcs{font-size:13px;color:var(--muted);display:flex;gap:6px 16px;flex-wrap:wrap}
+footer{font-size:12.5px;color:var(--muted);max-width:70ch}
+
+@media (max-width:620px){
+  .ticket{grid-template-columns:1fr}
+  .ticket .stub{border-left:0;border-top:2px dashed var(--line);grid-template-columns:auto auto 1fr;justify-items:start;align-items:center;text-align:left;padding:12px 16px 12px 22px;gap:4px 14px}
+  .ticket .stub::before{left:-10px;top:-11px}
+  .ticket .stub::after{left:auto;right:-10px;top:-11px;bottom:auto}
+  .ticket .main{border-radius:12px 12px 0 0}
+  .stub .big{font-size:26px}
+  .stub .gc{justify-self:end}
+  .cal .day{min-height:58px;padding:4px}
+  .cal .ev:not(.show){font-size:0;height:6px;padding:0;border-left-width:0;background:var(--a)}
+  .cal .ev.show{font-size:0}
+  .cal .ev.show::before{width:5px;height:5px}
+  .poster{flex-basis:148px;height:200px}
+  .upnext a{grid-template-columns:86px 1fr;gap:4px 10px}
+  .upnext .who{grid-column:2}
+  .hero{padding:18px}
+  .clock .sep{padding-bottom:20px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <h1><a href="#"><span>JAPAN LIVE TICKETS</span>日系演唱會搶票表</a></h1>
+    <div class="today" id="today"></div>
+  </div>
+
+  <!-- home -->
+  <div class="view" id="home">
+    <section>
+      <h2>歌手 <small>點海報看各自的完整資訊</small></h2>
+      <div class="rail" id="rail-home"></div>
+    </section>
+    <section class="hero" id="hero-home" aria-live="polite"></section>
+    <section>
+      <h2>近五週行事曆 <small>彩色條＝售票時間點，圓點＝演出</small></h2>
+      <div class="cal-wrap"><div class="cal" id="cal-home"></div></div>
+    </section>
+    <section>
+      <h2>搶票清單 <small>依下一個時間點排序，狀態會自動更新</small></h2>
+      <div class="tickets" id="tickets-home"></div>
+      <button class="toggle" type="button" data-past>顯示已結束的售票</button>
+    </section>
+    <section>
+      <h2>接下來的演出</h2>
+      <div class="upnext" id="upnext"></div>
+    </section>
+  </div>
+
+  <!-- artist page -->
+  <div class="view" id="artist" hidden>
+    <a class="back" href="#">← 回到全部歌手</a>
+    <div class="banner" id="banner"></div>
+    <section class="hero" id="hero-artist" aria-live="polite"></section>
+    <section>
+      <h2>搶票清單</h2>
+      <div class="tickets" id="tickets-artist"></div>
+      <button class="toggle" type="button" data-past>顯示已結束的售票</button>
+    </section>
+    <section>
+      <h2>近五週行事曆</h2>
+      <div class="cal-wrap"><div class="cal" id="cal-artist"></div></div>
+    </section>
+    <section id="sec-shows" style="scroll-margin-top:16px">
+      <h2>演出場次 <small>劃線＝已經演出</small></h2>
+      <div class="tickets" id="tours-artist"></div>
+    </section>
+    <section>
+      <h2>資料來源</h2>
+      <div class="srcs" id="srcs-artist"></div>
+    </section>
+    <section>
+      <h2>其他歌手</h2>
+      <div class="rail compact" id="rail-artist"></div>
+    </section>
+  </div>
+
+  <footer>資料整理於 2026-11-10（米津玄師、King Gnu、星街すいせい、YOASOBI、ずっと真夜中でいいのに。、久石讓、藤井風、Vaundy、tuki.），來源是官方網站、官方 FC、新聞和售票整理網站。標「待確認」的只有第三方資料，申請前請到官方網站再確認。日本時間（JST）比台灣快 1 小時，日本的時間都附上台灣時間。</footer>
+</div>
+
+<script>
+const ARTISTS = {
+  yonezu:  {name:"米津玄師", jp:"KENSHI YONEZU", short:"米津", mark:"K", color:"--c-yonezu", site:["官方網站","https://reissuerecords.net/"]},
+  kinggnu: {name:"King Gnu", jp:"キングヌー", short:"KingGnu", mark:"G", color:"--c-kinggnu", site:["官方網站","https://kinggnu.jp/"], fc:["CLUB GNU","https://clubgnu.com/10th_KICKOFF/"]},
+  suisei:  {name:"星街すいせい", jp:"HOSHIMACHI SUISEI", short:"すいせい", mark:"S", color:"--c-suisei", site:["官方網站","https://hoshimachi-suisei.jp/"], fc:["FC 星詠み","https://hoshimachi-suisei-fc.jp/"]},
+  yoasobi: {name:"YOASOBI", jp:"ヨアソビ", short:"YOASOBI", mark:"Y", color:"--c-yoasobi", site:["官方網站","https://www.yoasobi-music.jp/"]},
+  zutomayo:{name:"ずっと真夜中でいいのに。", jp:"ZUTOMAYO", short:"ずとまよ", mark:"Z", color:"--c-zutomayo", site:["官方網站","https://zutomayo.net/"], fc:["巡演售票頁","https://zutomayo.net/apicula/"]},
+  hisaishi:{name:"久石讓", jp:"JOE HISAISHI", short:"久石", mark:"J", color:"--c-hisaishi", site:["官方網站","https://joehisaishi.com/"], fc:["2027 演出表","https://joehisaishi.com/concert_category/2027/"]},
+  fujii:   {name:"藤井風", jp:"FUJII KAZE", short:"藤井風", mark:"F", color:"--c-fujii", site:["官方網站","https://fujiikaze.com/"], fc:["巡演官方頁","https://hehn.fujiikaze.com/pwt/"]},
+  vaundy:  {name:"Vaundy", jp:"バウンディ", short:"Vaundy", mark:"V", color:"--c-vaundy", site:["官方網站","https://vaundy.jp/"], fc:["FC VAWS 巡演頁","https://member.vaundy.jp/feature/ARENATOUR_2728?lang=ja"]},
+  tuki:    {name:"tuki.", jp:"TUKI", short:"tuki.", mark:"T", color:"--c-tuki", site:["官方網站","https://tuki-official.net/"]},
+};
+
+/* kind: range = 受付期間（end 可省略＝截止未公布） / point = 單一時間點 / tba = 尚未公布 */
+const PHASES = [
+  {a:"yonezu", tour:"2026 TOUR / GHOST", name:"CD 封入序號 最速先行", kind:"range", start:"2026-06-10T12:00+09:00", end:"2026-06-15T23:59+09:00", memo:"單曲〈Plazma / BOW AND ARROW〉初回特典序號"},
+  {a:"yonezu", tour:"2026 TOUR / GHOST", name:"一般發售（抽選）", kind:"range", start:"2026-07-07T12:00+09:00", end:"2026-07-26T23:59+09:00", result:"2026-08-12T12:00+09:00", memo:"抽選制"},
+  ...[["2026-11-11","橫濱"],["2026-11-12","橫濱"],["2026-11-18","大阪"],["2026-11-19","大阪"],["2026-11-27","福岡"],["2026-11-28","福岡"],["2026-12-03","宮城"],["2026-12-04","宮城"],["2026-12-08","愛知"],["2026-12-09","愛知"],["2026-12-16","橫濱"],["2026-12-17","橫濱"]].map(([d,c])=>{
+    const s=new Date(Date.UTC(+d.slice(0,4),+d.slice(5,7)-2,+d.slice(8,10))).toISOString().slice(0,10);
+    return {a:"yonezu", tour:`2026 TOUR / GHOST ${c} ${+d.slice(5,7)}/${+d.slice(8,10)}`, dates:[d], name:"官方轉售（抽選）", kind:"range", start:`${s}T12:00+09:00`, end:`${d}T08:59+09:00`, memo:"官方規則：每場演出前 1 個月 12:00 開始，到演出當天 8:59・每次最多 2 張・每天 9:00–12:00 陸續公布結果"};
+  }),
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"中信 財管鼎鑽卡優先購", kind:"range", start:"2026-10-24T12:00+08:00", end:"2026-10-24T16:00+08:00", memo:"遠大售票 Ticket Plus・實名制"},
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"中信卡友優先購", kind:"range", start:"2026-10-25T10:00+08:00", end:"2026-10-25T16:00+08:00", memo:"遠大售票 Ticket Plus・不含 AE 卡"},
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"台灣大哥大序號優先購", kind:"range", start:"2026-10-26T12:00+08:00", end:"2026-10-28T12:00+08:00", memo:"需台哥大活動序號"},
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"實名登記抽選", kind:"range", start:"2026-10-29T13:00+08:00", end:"2026-10-31T13:00+08:00", result:"2026-11-02T12:00+08:00", memo:"未中者另有候補抽選"},
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"復活抽選（候補）", kind:"range", start:"2026-11-04T12:00+08:00", memo:"第一輪沒抽中的人不用重新登記，依剩餘票數分多輪自動抽，每天 12:00 起通知・中選後要在隔天 10:00 前付款・到遠大「我的訂單」查有沒有待繳費訂單"},
+  {a:"yonezu", tour:"WORLD TOUR / GHOST 台北場", name:"一般售票（原訂 11/19 12:00）", kind:"point", at:"2026-11-19T12:00+08:00", cancelled:true, memo:"已確定不舉辦，票都在優先購、抽選和復活抽選階段賣出"},
+
+  {a:"kinggnu", tour:"10th Anniversary “KICKOFF”", name:"CLUB GNU 最速先行", kind:"range", start:"2026-10-05T18:00+09:00", end:"2026-10-24T23:59+09:00", result:"2026-11-03T15:00+09:00", memo:"FC 會員限定・因伺服器維修延長到 10/24・付款到 11/8 23:59"},
+  {a:"kinggnu", tour:"10th Anniversary “KICKOFF”", name:"CLUB GNU 2 次受付", kind:"range", start:"2026-11-10T18:00+09:00", end:"2026-11-19T23:59+09:00", result:"2026-12-02T15:00+09:00", memo:"FC 會員限定・只有指定席 ¥14,000・付款到 12/6 23:59・ローチケ App 電子票・禁止轉售"},
+  {a:"kinggnu", tour:"10th Anniversary “KICKOFF”", name:"一般發售", kind:"tba", memo:"尚未公布"},
+
+  {a:"suisei", tour:"ARENA TOUR 2026 “Once Upon a Stellar”", name:"星詠み FC 最速先行", kind:"range", start:"2026-03-22T21:00+09:00", end:"2026-04-06T23:59+09:00", memo:"FC 會員限定"},
+  {a:"suisei", tour:"ARENA TOUR 2026 “Once Upon a Stellar”", name:"線上直播 4 場通票", kind:"range", start:"2026-06-25T22:00+09:00", end:"2026-11-20T21:00+09:00", memo:"¥15,000・Hulu／SPWN／ZAIKO・回放看到 12/11"},
+  {a:"suisei", tour:"ARENA TOUR 2026 福岡終場", name:"線上直播 單場票", kind:"range", start:"2026-06-25T22:00+09:00", end:"2026-12-11T21:00+09:00", memo:"¥7,000・11/12 福岡場・回放看到 12/11 23:59"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2", name:"FC 抽選受付", kind:"range", start:"2026-08-30T20:00+09:00", end:"2026-09-13T23:59+09:00", memo:"FC 會員限定"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2", name:"FC 2 次抽選", kind:"range", start:"2026-09-24T00:00+09:00", end:"2026-10-04T23:59+09:00", memo:"FC 會員限定・時間以官方為準"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2 大分場", name:"FC 先行", kind:"range", start:"2026-10-19T00:00+09:00", end:"2026-10-28T23:59+09:00", memo:"FC 會員限定・時間以官方為準"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2 大分場", name:"星詠み會員 先着先行", kind:"range", start:"2026-11-06T18:00+09:00", end:"2026-12-07T23:59+09:00", memo:"FC 會員限定・先搶先贏，賣完就提早結束・每人 1 張"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2 大分場", name:"九州・沖縄居民抽選（ぴあ）", kind:"range", start:"2026-11-06T18:00+09:00", end:"2026-11-16T23:59+09:00", memo:"抽選制・不需 FC 會員，限住在九州・沖縄的人"},
+  {a:"suisei", tour:"星詠み ぱじゃまぱーてぃー Vol.2", name:"FC 會員轉售", kind:"tba", memo:"官方說之後會開，日期未公布"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"FC 1 次先行", kind:"range", start:"2026-03-22T21:00+09:00", end:"2026-04-06T23:59+09:00", result:"2026-04-16T18:00+09:00", memo:"FC 會員限定・同行者不需入會"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"FC 2 次先行", kind:"range", start:"2026-04-07T12:00+09:00", end:"2026-04-19T23:59+09:00", result:"2026-04-25T18:00+09:00", memo:"FC 會員限定"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"官方最速先行（ぴあ）", kind:"range", start:"2026-04-20T12:00+09:00", end:"2026-05-06T23:59+09:00", result:"2026-05-14T18:00+09:00", memo:"不需會員"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"海外居住者先行（インバウンド）", kind:"range", start:"2026-04-20T12:00+09:00", end:"2026-05-06T23:59+09:00", result:"2026-05-14T18:00+09:00", memo:"住在日本以外的人可申請・僅限信用卡"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"官方 2 次先行（ぴあ）", kind:"range", start:"2026-05-07T12:00+09:00", end:"2026-05-24T23:59+09:00", result:"2026-05-30T18:00+09:00", memo:"不需會員"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"いち早プレリザーブ（ぴあ）", kind:"range", start:"2026-05-25T12:00+09:00", end:"2026-05-31T23:59+09:00", result:"2026-06-06T18:00+09:00", memo:"限ぴあ卡付款"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"SS／S 區升級・FC 轉售", kind:"tba", memo:"官方說之後公布，限 FC 先行當選者"},
+  {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"一般發售", kind:"tba", cancelled:true, memo:"FC 售票頁寫明沒有一般發售，先行剩下的票也不會釋出・ぴあ 10 個先行階段都已結束"},
+
+  {a:"yoasobi", tour:"超惑星 日本巨蛋場", name:"一般發售（先着）", kind:"point", at:"2026-10-10T12:00+09:00", memo:"東京場在 ローチケ 顯示售完"},
+  {a:"yoasobi", tour:"超惑星 北海道場", name:"官方轉售 抽選", kind:"range", start:"2026-11-07T15:00+09:00", end:"2026-11-09T23:59+09:00", result:"2026-11-12T18:00+09:00", memo:"ローチケ限定・僅限信用卡・只能申請 1 張"},
+  {a:"yoasobi", tour:"超惑星 福岡場", name:"官方轉售 抽選", kind:"range", start:"2026-11-21T15:00+09:00", end:"2026-11-23T23:59+09:00", result:"2026-11-26T18:00+09:00", memo:"ローチケ限定・僅限信用卡・只能申請 1 張・e+／ぴあ買的票不能在這裡轉售"},
+  {a:"yoasobi", tour:"超惑星 東京巨蛋場", name:"官方轉售 抽選", kind:"range", start:"2026-11-28T15:00+09:00", end:"2026-11-30T23:59+09:00", result:"2026-12-03T18:00+09:00", memo:"ローチケ限定・僅限信用卡・只能申請 1 張・e+／ぴあ買的票不能在這裡轉售"},
+  {a:"yoasobi", tour:"超惑星 台北場", name:"國泰世華 CUBE 卡友優先購", kind:"range", start:"2026-09-16T12:00+08:00", end:"2026-09-16T18:00+08:00", memo:"遠大售票 Ticket Plus"},
+  {a:"yoasobi", tour:"超惑星 台北場", name:"實名登記抽選", kind:"range", start:"2026-09-17T12:00+08:00", end:"2026-09-20T19:00+08:00", memo:"全場實名制・官方 9/28 宣布兩天約 7 萬張全部售完，沒有再開一般售票"},
+
+  {a:"zutomayo", tour:"Hall Tour 2027「アピクラ電機」", name:"PREMIUM 會員最速先行", kind:"range", start:"2026-10-16T21:00+09:00", end:"2026-10-29T23:59+09:00", result:"2026-11-07T18:00+09:00", memo:"當選者付款期限 11/10 23:59"},
+  {a:"zutomayo", tour:"Hall Tour 2027「アピクラ電機」", name:"PREMIUM 會員二次先行", kind:"range", start:"2026-11-07T20:00+09:00", end:"2026-11-09T23:59+09:00", result:"2026-11-17T18:00+09:00", memo:"付款至 11/20 23:59"},
+  {a:"zutomayo", tour:"Hall Tour 2027「アピクラ電機」", name:"一般最速先行", kind:"range", start:"2026-11-17T20:00+09:00", end:"2026-11-29T23:59+09:00", result:"2026-12-05T18:00+09:00", memo:"不需會員・每場限 4 張・結果公布後付款到 12/8 23:59・海外可申請（+¥950）"},
+  {a:"zutomayo", tour:"Hall Tour 2027「アピクラ電機」", name:"プレミアム席 Upgrade", kind:"range", start:"2026-12-01T20:00+09:00", end:"2026-12-06T23:59+09:00", result:"2026-12-12T18:00+09:00", memo:"限 PREMIUM 先行購得指定席者・+¥1,500・張數要和當初買的一樣・付款到 12/15 23:59"},
+  {a:"zutomayo", tour:"Hall Tour 2027「アピクラ電機」", name:"一般發售", kind:"tba", memo:"尚未公布"},
+
+  {a:"hisaishi", tour:"MUSIC FUTURE Vol.13", name:"最速先着先行", kind:"range", start:"2026-05-22T12:00+09:00", end:"2026-06-04T23:59+09:00", memo:"先搶先贏"},
+  {a:"hisaishi", tour:"MUSIC FUTURE Vol.13", name:"二次先着先行", kind:"range", start:"2026-06-05T12:00+09:00", end:"2026-06-16T23:59+09:00", memo:"先搶先贏"},
+  {a:"hisaishi", tour:"MUSIC FUTURE Vol.13", name:"一般發售", kind:"point", at:"2026-06-19T12:00+09:00", memo:"e+／ローチケ／日テレゼロチケ"},
+  {a:"hisaishi", tour:"From Paris to Hollywood（久石讓特別嘉賓）", url:"https://eplus.jp/alexandredesplat/", name:"e+ 先着販售", kind:"point", at:"2026-04-08T18:00+09:00", memo:"賣完就不辦一般發售"},
+  {a:"hisaishi", tour:"From Paris to Hollywood（久石讓特別嘉賓）", name:"各售票網 先着販售", kind:"range", start:"2026-06-12T18:00+09:00", memo:"東京 12/7 已售完・大阪 12/9 在 e+ 仍受付中・ぴあ／ローチケ／ticketboard"},
+  {a:"hisaishi", tour:"日本センチュリー交響楽団 第303回定期", name:"大阪・京都場 發售中", kind:"range", start:"2026-09-10T10:00+09:00", memo:"センチュリー・ネットチケット或電話購買・開賣時間以官方為準"},
+
+  {a:"fujii", tid:"fujii-pwt", city:["福岡","大阪","東京"], tour:"Prema World Tour 日本巨蛋場", name:"最速先行（CD 序號抽選）", kind:"range", start:"2025-12-05T18:00+09:00", end:"2026-01-05T23:59+09:00", result:"2026-01-17T13:00+09:00", memo:"需《Prema》CD／LP 內的序號・e+"},
+  {a:"fujii", tid:"fujii-pwt", city:["福岡","大阪","東京"], tour:"Prema World Tour 日本巨蛋場", name:"一般抽選", kind:"range", start:"2026-04-24T12:00+09:00", end:"2026-05-06T23:59+09:00", result:"2026-05-16T13:00+09:00", memo:"不需會員・限日本居住者・每次最多 2 張・e+"},
+  {a:"fujii", tid:"fujii-pwt", city:["福岡","大阪","東京"], tour:"Prema World Tour 日本巨蛋場", name:"2 次抽選", kind:"range", start:"2026-08-14T12:00+09:00", end:"2026-08-23T23:59+09:00", result:"2026-09-02T13:00+09:00", memo:"限日本居住者・e+"},
+  {a:"fujii", tid:"fujii-pwt", city:"福岡", tour:"Prema World Tour 福岡場", name:"最終受付（抽選）", kind:"range", start:"2026-10-31T12:00+09:00", end:"2026-11-05T23:59+09:00", result:"2026-11-12T18:00+09:00", memo:"只有注釈付指定席與 11/15 カインド席・官方沒寫結果公布時間，11/12 18:00 來自第三方", unverified:true},
+  {a:"fujii", tid:"fujii-pwt", city:"大阪", tour:"Prema World Tour 大阪場", name:"官方轉讓（チケットトレード）", kind:"range", start:"2026-11-14T12:00+09:00", end:"2026-11-19T23:59+09:00", memo:"e+ 官方轉讓・限日本居住者"},
+  {a:"fujii", tid:"fujii-pwt", city:"東京", tour:"Prema World Tour 東京巨蛋場", name:"官方轉讓（チケットトレード）", kind:"range", start:"2026-11-24T12:00+09:00", end:"2026-11-29T23:59+09:00", memo:"e+ 官方轉讓・限日本居住者"},
+  {a:"fujii", tid:"fujii-pwt", city:"高雄", tour:"Prema World Tour 高雄場", name:"一般售票（KKTIX）", kind:"point", at:"2026-06-20T12:00+08:00", memo:"KKTIX／FamiPort・非實名制・每人最多 4 張"},
+  {a:"fujii", tid:"fujii-pwt", city:"首爾", tour:"Prema World Tour 首爾場", name:"Global 售票（Melon）", kind:"point", at:"2026-06-18T19:00+09:00", memo:"韓國時間・需身分驗證・每人最多 4 張"},
+  {a:"fujii", tid:"fujii-fpr", tour:"藤井風 ピアノリサイタル", name:"最速受付（抽選）", kind:"range", start:"2026-09-09T12:00+09:00", end:"2026-09-23T23:59+09:00", result:"2026-10-03T13:00+09:00", memo:"不需會員・限日本居住者・e+"},
+  {a:"fujii", tid:"fujii-fpr", tour:"藤井風 ピアノリサイタル", name:"一般抽選 2 次受付", kind:"range", start:"2026-10-24T12:00+09:00", end:"2026-10-27T23:59+09:00", result:"2026-10-31T13:00+09:00", memo:"僅指定席・日期來自第三方", unverified:true},
+  {a:"fujii", tid:"fujii-fpr", tour:"藤井風 ピアノリサイタル", name:"官方轉讓", kind:"range", start:"2026-11-05T12:00+09:00", end:"2026-11-08T23:59+09:00", memo:"e+ 官方轉讓"},
+
+  {a:"vaundy", tid:"vaundy-arena", city:["兵庫","愛知","福岡","北海道","大阪","廣島","新潟","岩手","神奈川","福井","熊本","香川","宮城"], tour:"JAPAN ARENA TOUR 2027-2028", name:"VAWS premium 先行", kind:"range", start:"2026-02-15T20:00+09:00", end:"2026-03-01T23:59+09:00", result:"2026-03-11T18:00+09:00", memo:"FC 付費會員限定"},
+  {a:"vaundy", tid:"vaundy-arena", city:["兵庫","愛知","福岡","北海道","大阪","廣島","新潟","岩手","神奈川","福井","熊本","香川","宮城"], tour:"JAPAN ARENA TOUR 2027-2028", name:"VAWS 先行", kind:"range", start:"2026-03-02T12:00+09:00", end:"2026-03-16T23:59+09:00", result:"2026-03-27T18:00+09:00", memo:"FC 會員限定"},
+  {a:"vaundy", tid:"vaundy-arena", city:["兵庫","愛知","福岡","北海道","大阪","廣島","新潟","岩手","神奈川","福井","熊本","香川","宮城"], tour:"JAPAN ARENA TOUR 2027-2028", name:"官方先行", kind:"range", start:"2026-03-17T12:00+09:00", end:"2026-03-29T23:59+09:00", result:"2026-04-04T18:00+09:00", memo:"不需會員"},
+  {a:"vaundy", tid:"vaundy-arena", city:["兵庫","愛知","福岡","北海道","大阪","廣島","新潟","岩手","神奈川","福井","熊本","香川","宮城"], tour:"JAPAN ARENA TOUR 2027-2028", name:"官方 2 次先行", kind:"range", start:"2026-03-30T12:00+09:00", end:"2026-04-12T23:59+09:00", result:"2026-04-18T18:00+09:00", memo:"不需會員・之後還有多輪ぴあ／セブン先行，原 30 場全部售完"},
+  {a:"vaundy", tid:"vaundy-arena", city:["兵庫","愛知","福岡","北海道","大阪","廣島","新潟","岩手","神奈川","福井","熊本","香川","宮城"], tour:"JAPAN ARENA TOUR 2027-2028", name:"ぴあ獨占先行", kind:"range", start:"2026-10-21T12:00+09:00", end:"2026-10-30T23:59+09:00", result:"2026-11-07T18:00+09:00", memo:"當選者付款期限 11/10 23:59"},
+  {a:"vaundy", tid:"vaundy-arena", city:"千葉", tour:"ARENA TOUR 千葉追加場", name:"VAWS premium 先行", kind:"range", start:"2026-11-07T18:00+09:00", end:"2026-11-15T23:59+09:00", result:"2026-11-20T18:00+09:00", memo:"FC 付費會員限定・同行者不需入會・付款到 11/23 23:59・海外居住者另有專屬受付（僅限信用卡）"},
+  {a:"vaundy", tid:"vaundy-arena", city:"千葉", tour:"ARENA TOUR 千葉追加場", name:"VAWS 先行", kind:"range", start:"2026-11-16T12:00+09:00", end:"2026-11-23T23:59+09:00", result:"2026-11-28T18:00+09:00", memo:"FC 會員限定・付款到 11/30 23:59・海外居住者另有專屬受付"},
+  {a:"vaundy", tid:"vaundy-arena", city:"千葉", tour:"ARENA TOUR 千葉追加場", name:"ぴあ最速抽選先行", kind:"range", start:"2026-11-20T12:00+09:00", end:"2026-11-26T23:59+09:00", result:"2026-12-03T18:00+09:00", memo:"免費ぴあ會員即可・需日本手機號碼・僅限信用卡"},
+  {a:"vaundy", tid:"vaundy-arena", tour:"JAPAN ARENA TOUR 2027-2028", name:"官方轉售・席位升級", kind:"tba", memo:"官方說之後公布"},
+  {a:"vaundy", tid:"vaundy-horo", city:"台北", tour:"ASIA ARENA TOUR “HORO” 台北場", name:"實名登記抽選", kind:"range", start:"2026-05-13T12:00+08:00", end:"2026-05-17T21:00+08:00", result:"2026-05-19T12:00+08:00", memo:"遠大售票 Ticket Plus・每人每場最多 2 張"},
+  {a:"vaundy", tid:"vaundy-horo", city:"台北", tour:"ASIA ARENA TOUR “HORO” 台北場", name:"一般售票", kind:"point", at:"2026-05-23T11:00+08:00", memo:"遠大售票 Ticket Plus・已售完"},
+
+  {a:"tuki", tid:"tuki-hall", tour:"秋の修学旅行〜天体観測〜", name:"月人 FC 最速抽選＋官方 1 次抽選", kind:"range", start:"2026-05-11T19:00+09:00", end:"2026-05-17T23:59+09:00", memo:"官方 1 次不需會員・e+"},
+  {a:"tuki", tid:"tuki-hall", tour:"秋の修学旅行〜天体観測〜", name:"官方 2 次抽選", kind:"range", start:"2026-05-22T19:00+09:00", end:"2026-05-31T23:59+09:00", memo:"e+"},
+  {a:"tuki", tid:"tuki-hall", tour:"秋の修学旅行〜天体観測〜", name:"官方 3 次抽選", kind:"range", start:"2026-06-05T19:00+09:00", end:"2026-06-14T23:59+09:00", memo:"e+"},
+  {a:"tuki", tid:"tuki-hall", tour:"秋の修学旅行〜天体観測〜", name:"官方先着先行", kind:"range", start:"2026-06-23T19:00+09:00", end:"2026-07-20T23:59+09:00", memo:"e+"},
+  {a:"tuki", tid:"tuki-hall", city:["福岡","大阪","愛知"], tour:"秋の修学旅行〜天体観測〜", name:"一般發售（先着）", kind:"range", start:"2026-07-25T10:00+09:00", end:"2026-11-30T18:00+09:00", memo:"e+ 顯示「予定枚数終了」（已售完）・福岡賣到 11/21、大阪 11/23、愛知 11/30・禁止轉售"},
+  {a:"tuki", tid:"tuki-bansan", tour:"星降る晩餐会 tuki. × 星街すいせい", name:"月人 FC 最速抽選＋官方 1 次抽選", kind:"range", start:"2026-08-30T21:00+09:00", end:"2026-09-13T23:59+09:00", memo:"官方 1 次不需會員・e+"},
+  {a:"tuki", tid:"tuki-bansan", tour:"星降る晩餐会 tuki. × 星街すいせい", name:"官方 2 次抽選", kind:"range", start:"2026-09-18T19:00+09:00", end:"2026-09-27T23:59+09:00", memo:"e+・每人最多 4 張"},
+  {a:"tuki", tid:"tuki-bansan", tour:"星降る晩餐会 tuki. × 星街すいせい", name:"官方先着先行", kind:"range", start:"2026-10-06T19:00+09:00", end:"2026-10-25T23:59+09:00", memo:"e+"},
+  {a:"tuki", tid:"tuki-bansan", tour:"星降る晩餐会 tuki. × 星街すいせい", name:"一般發售（先着）", kind:"range", start:"2026-10-31T10:00+09:00", end:"2026-12-19T23:59+09:00", memo:"e+ 受付中，但可能已接近售完・海外用 eplus.tickets・禁止轉售"},
+  {a:"suisei", tid:"suisei-bansan", homeHide:true, tour:"星降る晩餐会 tuki. × 星街すいせい", name:"一般發售（先着）", kind:"range", start:"2026-10-31T10:00+09:00", end:"2026-12-19T23:59+09:00", memo:"e+・和 tuki. 的合演，FC 先行已結束"},
+  {a:"tuki", tid:"tuki-fes", city:"大阪", tour:"FM802 RADIO CRAZY 2026", name:"官方第 5 次抽選＋ぴあ／ローチケ抽選", kind:"range", start:"2026-11-06T00:00+09:00", end:"2026-11-15T23:59+09:00", memo:"音樂祭票・ぴあ到 11/16、ローチケ到 11/17・海外可用 e+ 國際先着"},
+  {a:"tuki", tid:"tuki-fes", city:"千葉", tour:"COUNTDOWN JAPAN 26/27", name:"官方轉售（抽選配對）", kind:"range", start:"2026-12-07T16:00+09:00", end:"2026-12-14T16:00+09:00", memo:"音樂祭票全日售完・只能透過官方轉售，禁止私下轉讓"},
+];
+
+const TOURS = [
+  {id:"yonezu-jp", a:"yonezu", title:"米津玄師 2026 TOUR / GHOST", facts:[["日本","6 都市 14 場"],["票價","¥9,900"]],
+   shows:[["2026-11-06","長野","長野ビッグハット"],["2026-11-07","長野","長野ビッグハット"],["2026-11-11","神奈川","Kアリーナ横浜"],["2026-11-12","神奈川","Kアリーナ横浜"],["2026-11-18","大阪","大阪城ホール"],["2026-11-19","大阪","大阪城ホール"],["2026-11-27","福岡","マリンメッセ福岡 A館"],["2026-11-28","福岡","マリンメッセ福岡 A館"],["2026-12-03","宮城","セキスイハイムスーパーアリーナ"],["2026-12-04","宮城","セキスイハイムスーパーアリーナ"],["2026-12-08","愛知","ポートメッセなごや"],["2026-12-09","愛知","ポートメッセなごや"],["2026-12-16","神奈川","Kアリーナ横浜・終場"],["2026-12-17","神奈川","Kアリーナ横浜・終場"]],
+   note:"先行與一般抽選都已結束，現在只剩官方轉售：每場演出前 1 個月 12:00 開放，到當天 8:59 截止，搶票清單裡每場都有列出。"},
+  {id:"yonezu-world", a:"yonezu", title:"KENSHI YONEZU 2026-2027 WORLD TOUR / GHOST", facts:[["世界","11 都市"],["台北票價","NT$1,800–5,980"],["台北售票","遠大 Ticket Plus"]],
+   shows:[["2026-12-26","台北","臺北大巨蛋"],["2026-12-27","台北","臺北大巨蛋"],["2027-01-14","首爾","INSPIRE ARENA"],["2027-01-16","首爾","INSPIRE ARENA"],["2027-01-17","首爾","INSPIRE ARENA"],["2027-01-29","新加坡","Singapore Indoor Stadium・20:00"],["2027-01-30","新加坡","Singapore Indoor Stadium・20:00・追加場"],["2027-02-04","奧克蘭","Oakland Arena"],["2027-02-06","洛杉磯","The Kia Forum"],["2027-02-09","墨西哥市","Palacio de los Deportes"],["2027-02-12","紐華克","Prudential Center"],["2027-02-14","多倫多","Scotiabank Arena"],["2027-02-24","倫敦","The O2 Arena"],["2027-02-26","巴黎","Accor Arena"],["2027-02-28","阿姆斯特丹","Ziggo Dome"]],
+   note:"共 11 城 15 場。台北場 15:00 入場、18:00 開演。新加坡 1/30 是官方 10/22 公布的追加場。海外各站售票由當地主辦負責。"},
+  {id:"kinggnu", a:"kinggnu", title:"King Gnu 10th Anniversary Opening Live “KICKOFF”", facts:[["日本","2 巨蛋 4 場"],["指定席","¥14,000"],["SS指定席","¥16,000（僅最速先行）"],["申請","CLUB GNU"]],
+   shows:[["2027-02-17","東京","東京ドーム・18:30"],["2027-02-18","東京","東京ドーム・18:30"],["2027-03-13","大阪","京セラドーム大阪・17:00"],["2027-03-14","大阪","京セラドーム大阪・17:00"]],
+   note:"結成 10 週年紀念公演。申請資料要和 CLUB GNU 會員資料一致，否則可能視為落選。"},
+  {id:"kinggnu-us", a:"kinggnu", title:"King Gnu US TOUR '27", facts:[["美國","2 城 4 場"],["售票","Ticketmaster"]],
+   shows:[["2027-03-26","洛杉磯","The Wiltern・售完"],["2027-03-27","洛杉磯","The Wiltern・追加場"],["2027-04-02","紐約","Brooklyn Paramount・售完"],["2027-04-03","紐約","Brooklyn Paramount・追加場"]],
+   note:"11/7 公布兩場追加場。美國場透過 Ticketmaster 售票。"},
+  {id:"suisei-arena", a:"suisei", title:"HOSHIMACHI SUISEI ARENA TOUR 2026 “Once Upon a Stellar”", facts:[["日本","4 都市 5 場"],["指定席","¥11,000（售完）"],["注釈付指定席","¥11,000"],["見切れ体感席","¥9,900"],["直播","單場 ¥7,000／通票 ¥15,000"]],
+   shows:[["2026-09-08","神奈川","Kアリーナ横浜・19:00"],["2026-09-09","神奈川","Kアリーナ横浜・19:00"],["2026-10-21","兵庫","GLION ARENA KOBE・19:00"],["2026-11-07","愛知","IGアリーナ・18:00"],["2026-11-12","福岡","マリンメッセ福岡 A館・19:00・終場"]],
+   note:"現場票的先行和轉售都已結束。福岡終場可以買線上直播（單場票賣到 12/11 21:00），日本電影院也有 LIVE VIEWING。"},
+  {id:"suisei-pajama", a:"suisei", title:"星詠み ぱじゃまぱーてぃー Vol.2（FC 見面會）", facts:[["日本","3 都市 3 場"],["票價","指定席 ¥8,800（附周邊）"],["申請","星詠み FC"]],
+   shows:[["2027-02-07","大分","iichikoグランシアタ・18:00"],["2027-02-20","石川","松任文化会館 ピーノ・18:00"],["2027-02-27","秋田","あきた芸術劇場 ミルハス 中ホール・18:00"]],
+   note:"FC 會員限定的見面會，每人限 1 張、入場要驗本人。大分場現在開放會員先着先行，也開放住在九州・沖縄的非會員從ぴあ申請。"},
+  {id:"suisei-mgo", a:"suisei", title:"Midnight Grand Orchestra 2nd LIVE “Project: Allegro”", facts:[["千葉","1 場"],["票價","站席 ¥11,000"]],
+   shows:[["2027-02-11","千葉","幕張メッセ 4-6ホール・17:00"]],
+   note:"星街すいせい × TAKU INOUE。只有站席，每人限 2 張。所有先行都已結束，官方表示不會一般發售。SS／S 區升級和 FC 轉售之後公布。"},
+  {id:"yoasobi", a:"yoasobi", title:"YOASOBI 11-CITY ASIA-OCEANIA TOUR 2026-2027 “超惑星”", facts:[["日本","¥14,000"],["台北","NT$1,800–6,880"],["台北售票","遠大 Ticket Plus"]],
+   shows:[["2026-10-24","大阪","京セラドーム大阪"],["2026-10-25","大阪","京セラドーム大阪"],["2026-11-07","愛知","バンテリンドーム ナゴヤ"],["2026-11-08","愛知","バンテリンドーム ナゴヤ"],["2026-11-14","北海道","大和ハウス プレミストドーム"],["2026-11-15","北海道","大和ハウス プレミストドーム"],["2026-11-28","福岡","みずほPayPayドーム福岡"],["2026-11-29","福岡","みずほPayPayドーム福岡"],["2026-12-05","東京","東京ドーム"],["2026-12-06","東京","東京ドーム・日本終場"],["2027-01-09","台北","臺北大巨蛋"],["2027-01-10","台北","臺北大巨蛋"],["2027-01-21","香港","AsiaWorld-Arena"],["2027-01-22","香港","AsiaWorld-Arena"],["2027-02-20","新加坡","National Stadium"],["2027-03-17","墨爾本","Rod Laver Arena"],["2027-03-19","雪梨","Afterpay Arena"],["2027-04-17","韓國","城市與會場未公布"]],
+   note:"11/9 官方把巡演改名為 11-CITY ASIA-OCEANIA TOUR，取消部分原訂國家和場館（沒說是哪些），並加入墨爾本、雪梨。日本場週六 18:00、週日 17:00 開演。台北場已全部售完。"},
+  {id:"zutomayo", a:"zutomayo", title:"ZUTOMAYO Hall Tour 2027「アピクラ電機」LÚ.NIM.LÀL", facts:[["日本","23 都市 36 場"],["票價","¥9,900"],["售票","チケットぴあ"]],
+   shows:[["2027-01-15","廣島","広島文化学園HBGホール"],["2027-01-18","千葉","市川市文化会館"],["2027-01-19","千葉","市川市文化会館"],["2027-01-21","東京","J:COMホール八王子"],["2027-01-26","東京","SGCホール有明"],["2027-01-27","東京","SGCホール有明"],["2027-02-06","靜岡","富士市文化会館ロゼシアター"],["2027-02-15","兵庫","神戸国際会館こくさいホール"],["2027-02-16","兵庫","神戸国際会館こくさいホール"],["2027-02-21","大分","iichikoグランシアタ"],["2027-02-23","熊本","熊本城ホール"],["2027-02-27","福島","いわきアリオス 大ホール"],["2027-03-04","東京","東京ガーデンシアター"],["2027-03-05","東京","東京ガーデンシアター"],["2027-03-13","愛媛","松山市民会館"],["2027-03-15","福岡","福岡サンパレス"],["2027-03-16","山口","KDDI維新ホール"],["2027-03-24","愛知","愛知県芸術劇場"],["2027-03-25","愛知","愛知県芸術劇場"],["2027-03-30","石川","金沢歌劇座"],["2027-03-31","石川","金沢歌劇座"],["2027-04-08","奈良","なら100年会館"],["2027-04-10","岡山","ハレノワ 大劇場"],["2027-04-11","岡山","ハレノワ 大劇場"],["2027-04-20","北海道","札幌文化芸術劇場 hitaru"],["2027-04-21","北海道","札幌文化芸術劇場 hitaru"],["2027-04-27","大阪","フェスティバルホール"],["2027-04-28","大阪","フェスティバルホール"],["2027-05-01","東京","立川ステージガーデン"],["2027-05-02","東京","立川ステージガーデン"],["2027-05-11","宮城","仙台サンプラザホール"],["2027-05-12","宮城","仙台サンプラザホール"],["2027-05-17","神奈川","カルッツかわさき"],["2027-05-18","神奈川","カルッツかわさき"],["2027-05-22","和歌山","和歌山県民文化会館"],["2027-05-23","和歌山","和歌山県民文化会館"]],
+   note:"11/17 開始的一般最速先行不需要會員，海外可從官方頁面的 Outside Japan 入口申請。"},
+  {id:"hisaishi-26", a:"hisaishi", title:"久石讓 2026 亞洲・歐洲巡演（指揮）", facts:[["新加坡","Orchestre de Paris"],["歐洲","Royal Philharmonic Orchestra"],["新加坡售票","SISTIC"]],
+   shows:[["2026-11-12","新加坡","Esplanade Concert Hall"],["2026-11-13","新加坡","Esplanade Concert Hall"],["2026-11-14","新加坡","The Star Theatre"],["2026-11-23","倫敦","Royal Albert Hall"],["2026-11-25","慕尼黑","Isarphilharmonie"],["2026-11-26","琉森","KKL Luzern"],["2026-11-28","斯圖加特","Liederhalle Beethovensaal"],["2026-11-30","柏林","Philharmonie Berlin"],["2026-12-02","漢堡","Elbphilharmonie"]],
+   note:"久石讓本人指揮。巡演官網把倫敦場標為售完，其他城市請到各場館售票頁確認。"},
+  {id:"hisaishi-mf13", a:"hisaishi", title:"久石讓 presents MUSIC FUTURE Vol.13", facts:[["東京","1 場"],["票價","S ¥12,000／A ¥10,000／B ¥8,000"]],
+   shows:[["2026-11-04","東京","東京オペラシティ コンサートホール・19:00"]],
+   note:"久石讓指揮 Music Future Band，已演出。"},
+  {id:"hisaishi-desplat", a:"hisaishi", title:"From Paris to Hollywood — Alexandre Desplat 電影配樂之夜", facts:[["日本","2 場"],["票價","S ¥21,000／A ¥18,500／管風琴席 ¥16,500"],["VIP","¥40,000（含 Q&A）"]],
+   shows:[["2026-12-07","東京","サントリーホール 大ホール・19:00・售完"],["2026-12-09","大阪","ザ・シンフォニーホール・19:00"]],
+   note:"由 Alexandre Desplat 指揮，久石讓是特別嘉賓，只參與部分曲目，不是主秀。"},
+  {id:"hisaishi-jcso", a:"hisaishi", title:"日本センチュリー交響楽団 第303回定期（大阪）・京都特別演奏会", facts:[["大阪","S ¥10,000～D ¥3,000"],["京都","S ¥7,000／A ¥5,500"],["鋼琴","亀井聖矢"]],
+   shows:[["2027-01-16","大阪","ザ・シンフォニーホール・14:00"],["2027-01-17","京都","京都コンサートホール・14:00"]],
+   note:"久石讓指揮。曲目：布拉姆斯《大學慶典序曲》、Nico Muhly 鋼琴協奏曲（日本首演）、布拉姆斯第四號交響曲。目前發售中。"},
+  {id:"hisaishi-27", a:"hisaishi", title:"久石讓 2027 北美・歐洲客席指揮", facts:[["北美","費城／芝加哥／休士頓"],["歐洲","羅馬／巴黎"]],
+   shows:[["2027-03-05","費城","Kimmel Center・Philadelphia Orchestra"],["2027-03-06","費城","Kimmel Center・Philadelphia Orchestra"],["2027-03-07","費城","Kimmel Center・Philadelphia Orchestra"],["2027-04-30","芝加哥","Symphony Center・Chicago Symphony Orchestra"],["2027-05-01","芝加哥","Symphony Center・Chicago Symphony Orchestra"],["2027-05-07","休士頓","Jones Hall・Houston Symphony"],["2027-05-08","休士頓","Jones Hall・Houston Symphony"],["2027-05-09","休士頓","Jones Hall・Houston Symphony"],["2027-06-03","羅馬","Sala Santa Cecilia"],["2027-06-04","羅馬","Sala Santa Cecilia"],["2027-06-05","羅馬","Sala Santa Cecilia"],["2027-06-09","巴黎","Philharmonie de Paris・Orchestre de Paris"],["2027-06-10","巴黎","Philharmonie de Paris・Orchestre de Paris"]],
+   note:"休士頓 5/9 只出現在久石讓官網。海外場次的售票由各樂團負責。目前查不到台灣場次。"},
+  {id:"fujii-pwt", a:"fujii", title:"Fujii Kaze Prema World Tour", facts:[["日本","指定席 ¥15,000"],["高雄","NT$1,800–5,800"],["首爾","₩132,000–210,000"],["售票","e+（日本）"]],
+   shows:[["2026-10-31","高雄","高雄國家體育場（世運主場館）・19:00"],["2026-11-14","福岡","みずほPayPayドーム福岡・18:00"],["2026-11-15","福岡","みずほPayPayドーム福岡・18:00"],["2026-12-10","大阪","京セラドーム大阪・19:00"],["2026-12-12","大阪","京セラドーム大阪・18:00"],["2026-12-13","大阪","京セラドーム大阪・18:00"],["2026-12-19","東京","東京ドーム・18:00"],["2026-12-20","東京","東京ドーム・18:00"],["2027-01-09","首爾","高尺巨蛋 Gocheok Sky Dome・18:00"]],
+   note:"沒有官方 FC，所以沒有會員先行。曼谷（12/26）和香港場已取消。2027 夏天的歐洲、北美場次官方說之後公布。"},
+  {id:"fujii-fpr", a:"fujii", title:"藤井風 ピアノリサイタル（鋼琴獨奏會）", facts:[["東京","2 場"],["票價","指定席 ¥9,000"]],
+   shows:[["2026-11-20","東京","東京ドーム・19:00（YouTube 直播）"],["2026-11-21","東京","東京ドーム・18:00"]],
+   note:"和巡演分開的鋼琴獨奏會。11/20 場會在官方 YouTube 免費直播。"},
+  {id:"vaundy-arena", a:"vaundy", title:"Vaundy JAPAN ARENA TOUR 2027-2028", facts:[["日本","16 地 32 場"],["票價","全席 ¥9,900"],["申請","FC VAWS／ぴあ"]],
+   shows:[["2027-08-14","兵庫","GLION ARENA KOBE・18:00"],["2027-08-15","兵庫","GLION ARENA KOBE・16:00"],["2027-08-28","愛知","日本ガイシホール・18:00"],["2027-08-29","愛知","日本ガイシホール・16:00"],["2027-09-19","福岡","マリンメッセ福岡 A館・18:00"],["2027-09-20","福岡","マリンメッセ福岡 A館・16:00"],["2027-09-25","北海道","真駒内セキスイハイムアイスアリーナ・18:00"],["2027-09-26","北海道","真駒内セキスイハイムアイスアリーナ・16:00"],["2027-10-02","大阪","大阪城ホール・18:00"],["2027-10-03","大阪","大阪城ホール・16:00"],["2027-10-16","廣島","広島グリーンアリーナ・18:00"],["2027-10-17","廣島","広島グリーンアリーナ・16:00"],["2027-10-23","新潟","朱鷺メッセ・18:00"],["2027-10-24","新潟","朱鷺メッセ・16:00"],["2027-11-20","岩手","盛岡タカヤアリーナ・18:00"],["2027-11-21","岩手","盛岡タカヤアリーナ・16:00"],["2027-11-27","神奈川","横浜アリーナ・18:00"],["2027-11-28","神奈川","横浜アリーナ・16:00"],["2027-12-04","千葉","LaLa arena TOKYO-BAY・18:00・追加場"],["2027-12-05","千葉","LaLa arena TOKYO-BAY・16:00・追加場"],["2027-12-11","福井","サンドーム福井・18:00"],["2027-12-12","福井","サンドーム福井・16:00"],["2028-01-09","大阪","大阪城ホール・18:00"],["2028-01-10","大阪","大阪城ホール・16:00"],["2028-01-15","愛知","IGアリーナ・18:00"],["2028-01-16","愛知","IGアリーナ・16:00"],["2028-01-22","熊本","グランメッセ熊本・18:00"],["2028-01-23","熊本","グランメッセ熊本・16:00"],["2028-02-05","香川","あなぶきアリーナ香川・18:00"],["2028-02-06","香川","あなぶきアリーナ香川・16:00"],["2028-02-26","宮城","ゼビオアリーナ仙台・18:00"],["2028-02-27","宮城","ゼビオアリーナ仙台・16:00"]],
+   note:"除了 11/7 新公布的千葉追加場，其他 30 場都已售完。千葉場現在開放 FC 先行，海外居住的會員也能申請。5 歲以下不能入場。"},
+  {id:"vaundy-horo", a:"vaundy", title:"Vaundy ASIA ARENA TOUR 2026 “HORO”", facts:[["亞洲","5 地"],["台北票價","NT$800–5,880"],["台北售票","遠大 Ticket Plus"]],
+   shows:[["2026-09-05","千葉","幕張メッセ 9・11ホール"],["2026-09-06","千葉","幕張メッセ 9・11ホール"],["2026-09-19","首爾","INSPIRE ARENA"],["2026-09-20","首爾","INSPIRE ARENA"],["2026-10-03","香港","AsiaWorld-Arena"],["2026-10-24","北九州","北九州メッセ"],["2026-10-25","北九州","北九州メッセ"],["2026-10-31","台北","台北小巨蛋・19:00"],["2026-11-01","台北","台北小巨蛋・19:00"]],
+   note:"已全部演出完畢，每場都售完。上海場（11/14–15）在開賣前就取消了。"},
+  {id:"tuki-hall", a:"tuki", title:"tuki. 首次巡迴『秋の修学旅行〜天体観測〜』", facts:[["日本","5 地 6 場"],["票價","S指定席 ¥13,200／指定席 ¥9,900"],["售票","e+"]],
+   shows:[["2026-10-11","東京","SGCホール有明・18:00"],["2026-10-12","東京","SGCホール有明・17:00"],["2026-11-03","宮城","仙台サンプラザホール・18:00"],["2026-11-22","福岡","福岡市民ホール 大ホール・18:00"],["2026-11-26","大阪","フェスティバルホール・19:00"],["2026-12-02","愛知","Niterra日本特殊陶業市民会館 フォレストホール・19:00"]],
+   note:"剩下的福岡、大阪、愛知場在 e+ 都顯示已售完。官方禁止轉售。"},
+  {id:"tuki-bansan", a:"tuki", title:"星降る晩餐会 tuki. × 星街すいせい", facts:[["神奈川","1 場"],["票價","S指定席 ¥13,200／指定席 ¥9,900"],["售票","e+"]],
+   shows:[["2026-12-20","神奈川","Kアリーナ横浜・17:30"]],
+   note:"tuki. 和星街すいせい的一夜限定合演。e+ 一般發售開到 12/19，但可能已接近售完。"},
+  {id:"suisei-bansan", a:"suisei", title:"星降る晩餐会 tuki. × 星街すいせい", facts:[["神奈川","1 場"],["票價","S指定席 ¥13,200／指定席 ¥9,900"],["售票","e+"]],
+   shows:[["2026-12-20","神奈川","Kアリーナ横浜・17:30"]],
+   note:"和 tuki. 的一夜限定合演。完整售票階段在 tuki. 的頁面。"},
+  {id:"tuki-fes", a:"tuki", title:"tuki. 音樂祭演出", facts:[["大阪","RADIO CRAZY 1DAY ¥13,500"],["千葉","COUNTDOWN JAPAN（已售完）"]],
+   shows:[["2026-12-26","大阪","FM802 RADIO CRAZY 2026・インテックス大阪"],["2026-12-29","千葉","COUNTDOWN JAPAN 26/27・幕張メッセ"]],
+   note:"音樂祭票是整天的票，tuki. 的演出時段還沒公布。CDJ 是她第一次上音樂祭。"},
+];
+
+const SOURCES = {
+  yonezu:[["官方售票","https://ticket.kenshiyonezu.jp/tour/2026"],["THE FIRST TIMES","https://www.thefirsttimes.jp/news/0000840280/"],["Real Sound","https://realsound.jp/2026/10/post-2555048.html"],["台北場整理","https://www.shinygoods.tw/kenshi-yonezu-taipei-dome-2026-concert-guide"],["商業周刊","https://www.businessweekly.com.tw/style/blog/3023463"]],
+  kinggnu:[["CLUB GNU","https://clubgnu.com/10th_KICKOFF/"],["Sony Music 票務詳情","https://www.sonymusic.co.jp/artist/kinggnu/info/587088"],["官方延長公告","https://www.sonymusic.co.jp/artist/kinggnu/info/587876"],["US TOUR '27","https://www.sonymusic.co.jp/artist/kinggnu/info/588333"]],
+  suisei:[["星詠み 售票列表","https://hoshimachi-suisei-fc.jp/s/hs/ticket/list"],["星詠み 巡演票務","https://hoshimachi-suisei-fc.jp/s/hs/page/arena_tour_2026_ticket"],["ぱじゃまぱーてぃー Vol.2","https://hoshimachi-suisei-fc.jp/s/hs/page/pajamaparty"],["大分場 FC 受付","https://hoshimachi-suisei-fc.jp/s/hs/ticket/detail/261106"],["ぴあ 九州・沖縄受付","https://w.pia.jp/t/hsfmtg-v2/"],["Project: Allegro","https://hoshimachi-suisei-fc.jp/Project_Allegro/"],["PR TIMES","https://prtimes.jp/main/html/rd/p/000000188.000170825.html"],["音樂ナタリー","https://natalie.mu/music/news/665040"]],
+  yoasobi:[["官方：巡演改名與場次","https://www.yoasobi-music.jp/news/588376"],["官方：官方轉售","https://www.yoasobi-music.jp/news/587745"],["官方：一般發售","https://www.yoasobi-music.jp/news/587488"],["官方：台北場售完","https://www.yoasobi-music.jp/news/587197"],["巡演特設頁","https://www.yoasobi-music.jp/special/superplanet/"],["ローチケ 轉售","https://l-tike.com/yoasobi/"],["商業周刊","https://www.businessweekly.com.tw/style/blog/3022368"]],
+  zutomayo:[["官方巡演頁","https://zutomayo.net/apicula/"],["音樂ナタリー","https://natalie.mu/music/news/694085"]],
+  hisaishi:[["官方 2026 演出表","https://joehisaishi.com/concert_category/2026/"],["官方 2027 演出表","https://joehisaishi.com/concert_category/2027/"],["MUSIC FUTURE Vol.13","https://joehisaishi-concert.com/mf-vol13/"],["From Paris to Hollywood","https://aegx.jp/schedule/12/2026/2324/"],["日本センチュリー 大阪","https://jcso.or.jp/concert/10097/"],["日本センチュリー 京都","https://jcso.or.jp/concert/10328/"],["Deutsche Grammophon","https://www.deutschegrammophon.com/en/artists/joe-hisaishi/on-tour"],["SISTIC 新加坡","https://www.sistic.com.sg/events/joe1126"]],
+  fujii:[["Prema World Tour 官方","https://hehn.fujiikaze.com/pwt/"],["鋼琴獨奏會官方","https://hehn.fujiikaze.com/fpr/"],["官方消息（一般抽選）","https://fujiikaze.com/news-article/news260421/"],["官方消息（2 次抽選）","https://fujiikaze.com/news-article/news260810/"],["e+ 大阪轉讓","https://eplus.jp/fujiikaze2026/trade-osaka/"],["e+ 東京轉讓","https://eplus.jp/fujiikaze2026/trade-tokyo/"],["KKTIX 高雄","https://kklivetw.kktix.cc/events/34473ba4"],["Melon 首爾","https://tkglobal.melon.com/performance/index.htm?langCd=EN&prodId=213396"],["LIGNEA","https://lignea.co.jp/fujiikaze-ticket/"]],
+  vaundy:[["官方消息（千葉追加場）","https://vaundy.jp/news/detail/11145"],["FC 巡演頁","https://member.vaundy.jp/feature/ARENATOUR_2728?lang=ja"],["FC 追加場受付","https://member.vaundy.jp/news/detail/11328"],["HORO 巡演頁","https://member.vaundy.jp/feature/ASIAARENATOUR_2026"]],
+  tuki:[["官方巡演消息","https://tuki-official.net/contents/1094029"],["e+ 巡演","https://eplus.jp/tuki.2026/"],["星降る晩餐会 官方","https://tuki-official.net/contents/1104832"],["e+ 星降る晩餐会","https://eplus.jp/hoshifuru_bansankai/"],["RADIO CRAZY 出演","https://tuki-official.net/contents/1125635"],["RADIO CRAZY 售票","https://radiocrazy.fm/ticket/"],["CDJ 出演","https://tuki-official.net/contents/1118768"],["CDJ 售票","https://countdownjapan.jp/2627/ticket/"]],
+};
+
+const WD=["日","一","二","三","四","五","六"];
+const state={past:false};
+const ms=s=>new Date(s).getTime(), isJST=s=>s.endsWith("+09:00"), pad=n=>String(n).padStart(2,"0");
+const $=id=>document.getElementById(id);
+function parts(s){ const [d,t]=s.slice(0,16).split("T"); const [y,m,dd]=d.split("-").map(Number); return {y,m,d:dd,wd:WD[new Date(Date.UTC(y,m-1,dd,12)).getUTCDay()],hm:t||""}; }
+function tw(s){ const x=new Date(ms(s)+8*3600e3); return `${pad(x.getUTCMonth()+1)}/${pad(x.getUTCDate())} ${pad(x.getUTCHours())}:${pad(x.getUTCMinutes())}`; }
+function twDate(s){ return new Date(ms(s)+8*3600e3).toISOString().slice(0,10); }
+function fmt(s){ const p=parts(s); return `${pad(p.m)}/${pad(p.d)}(${p.wd}) ${p.hm}`; }
+function fmtTz(s){ return isJST(s)?`${fmt(s)} JST <em>／台灣 ${tw(s)}</em>`:`${fmt(s)} 台灣`; }
+function until(t,now){ const d=t-now,h=d/3600e3; if(h<1) return `${Math.max(1,Math.round(d/60e3))} 分鐘`; if(h<48) return `${Math.round(h)} 小時`; return `${Math.round(h/24)} 天`; }
+const japanToday=()=>new Date(Date.now()+9*3600e3).toISOString().slice(0,10);
+function gcal(title,startIso,details){ const z=t=>new Date(t).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,""); const st=ms(startIso);
+  return "https://calendar.google.com/calendar/render?"+new URLSearchParams({action:"TEMPLATE",text:title,dates:`${z(st)}/${z(st+30*60e3)}`,details}).toString(); }
+
+function status(p,now){
+  if(p.cancelled) return {cls:"st-past",label:"不舉辦",key:Infinity,group:2,anchor:p.at||p.start,cap:"原訂"};
+  if(p.kind==="tba") return {cls:"st-tba",label:"未公布",key:Infinity,group:2};
+  if(p.kind==="point"){ const t=ms(p.at); return now<t?{cls:"st-soon",label:"即將開賣",key:t,group:0,count:`${until(t,now)}後`,anchor:p.at,target:t,verb:"開賣",calStart:p.at}:{cls:"st-past",label:"已過",key:t,group:3,anchor:p.at}; }
+  const s=ms(p.start);
+  if(!p.end) return now<s?{cls:"st-soon",label:"即將開始",key:s,group:0,count:`${until(s,now)}後開始`,anchor:p.start,cap:"開始",target:s,verb:"開始受付",calStart:p.start}
+                         :{cls:"st-open",label:"受付中",key:9e15,group:0,count:"截止日未公布",anchor:p.start,cap:"開始"};
+  const e=ms(p.end),r=p.result?ms(p.result):null;
+  if(now<s) return {cls:"st-soon",label:"即將開始",key:s,group:0,count:`${until(s,now)}後開始`,anchor:p.start,cap:"開始",target:s,verb:"開始受付",calStart:p.start};
+  if(now<=e) return {cls:"st-open",label:"受付中",key:e,group:0,count:`剩 ${until(e,now)}`,anchor:p.end,cap:"截止",target:e,verb:"截止",calStart:new Date(e-2*3600e3).toISOString(),calLabel:"截止前提醒"};
+  if(r&&now<r) return {cls:"st-wait",label:"等結果",key:r,group:1,count:`${until(r,now)}後公布`,anchor:p.result,cap:"公布",target:r,verb:"公布結果",calStart:p.result,calLabel:"結果公布"};
+  return {cls:"st-past",label:"已結束",key:e,group:3,anchor:p.end,cap:"截止"};
+}
+/* Which shows each ticket phase is for. A phase may set tid/city itself; otherwise the first matching rule wins:
+   [artist, text in phase.tour, tour id, city filter (string or list, optional)] */
+const LINK=[
+  ["yonezu","台北","yonezu-world","台北"],["yonezu","","yonezu-jp"],
+  ["kinggnu","","kinggnu"],
+  ["suisei","大分","suisei-pajama","大分"],["suisei","ぱじゃま","suisei-pajama"],["suisei","Allegro","suisei-mgo"],["suisei","福岡","suisei-arena","福岡"],["suisei","","suisei-arena"],
+  ["yoasobi","北海道","yoasobi","北海道"],["yoasobi","福岡","yoasobi","福岡"],["yoasobi","東京","yoasobi","東京"],["yoasobi","台北","yoasobi","台北"],["yoasobi","日本","yoasobi",["大阪","愛知","北海道","福岡","東京"]],
+  ["zutomayo","","zutomayo"],
+  ["hisaishi","MUSIC FUTURE","hisaishi-mf13"],["hisaishi","Hollywood","hisaishi-desplat"],["hisaishi","センチュリー","hisaishi-jcso"],
+];
+/* Where to apply / buy. Tour default first, then phase-specific overrides [artist, text in tour, text in name, url]. */
+const TP="https://ticketplus.com.tw/";
+const TICKET={
+  "yonezu-jp":"https://ticket.kenshiyonezu.jp/tour/2026", "yonezu-world":TP,
+  "kinggnu":"https://clubgnu.com/10th_KICKOFF/", "kinggnu-us":"https://clubgnu.com/US_tour27/",
+  "suisei-arena":"https://hoshimachi-suisei-fc.jp/s/hs/page/arena_tour_2026_ticket", "suisei-pajama":"https://hoshimachi-suisei-fc.jp/s/hs/page/pajamaparty",
+  "suisei-mgo":"https://hoshimachi-suisei-fc.jp/Project_Allegro/", "suisei-bansan":"https://eplus.jp/hoshifuru_bansankai/",
+  "yoasobi":"https://www.yoasobi-music.jp/", "zutomayo":"https://zutomayo.net/apicula/",
+  "hisaishi-26":"https://www.sistic.com.sg/events/joe1126", "hisaishi-mf13":"https://joehisaishi-concert.com/mf-vol13/",
+  "hisaishi-desplat":"https://aegx.jp/schedule/12/2026/2324/", "hisaishi-jcso":"https://yyk1.ka-ruku.com/jcso-s/showList", "hisaishi-27":"https://joehisaishi.com/concert_category/2027/",
+  "fujii-pwt":"https://hehn.fujiikaze.com/pwt/", "fujii-fpr":"https://eplus.jp/fujiikaze-pianorecital/",
+  "vaundy-arena":"https://member.vaundy.jp/feature/ARENATOUR_2728?lang=ja", "vaundy-horo":"https://member.vaundy.jp/feature/ASIAARENATOUR_2026",
+  "tuki-hall":"https://eplus.jp/tuki.2026/", "tuki-bansan":"https://eplus.jp/hoshifuru_bansankai/", "tuki-fes":"https://radiocrazy.fm/ticket/",
+};
+const PHASE_URL=[
+  ["yoasobi","台北","",TP],["yoasobi","","轉售","https://l-tike.com/yoasobi/"],["yoasobi","","一般發售","https://www.yoasobi-music.jp/special/superplanet/"],
+  ["suisei","大分","先着","https://hoshimachi-suisei-fc.jp/s/hs/ticket/detail/261106"],["suisei","大分","九州","https://w.pia.jp/t/hsfmtg-v2/"],
+  ["fujii","福岡","最終","https://eplus.jp/fujiikaze2026/add-fukuoka/"],["fujii","大阪","轉讓","https://eplus.jp/fujiikaze2026/trade-osaka/"],["fujii","東京巨蛋","轉讓","https://eplus.jp/fujiikaze2026/trade-tokyo/"],
+  ["fujii","高雄","","https://kklivetw.kktix.cc/events/34473ba4"],["fujii","首爾","","https://tkglobal.melon.com/performance/index.htm?langCd=EN&prodId=213396"],["fujii","ピアノ","轉讓","https://eplus.jp/fujiikaze-pianorecital/trade/"],
+  ["vaundy","千葉","premium","https://member.vaundy.jp/feature/9b10f32b6f6d8d223c4c565e586592f6"],["vaundy","千葉","","https://member.vaundy.jp/news/detail/11328"],
+  ["yonezu","2026 TOUR / GHOST","轉售","https://ticket.kenshiyonezu.jp/tour/2026"],
+  ["tuki","COUNTDOWN","","https://countdownjapan.jp/2627/news/5987/"],
+  ["tuki","COUNTDOWN","","https://countdownjapan.jp/2627/ticket/"],
+];
+const HOSTS={"eplus.jp":"e+","w.pia.jp":"チケットぴあ","ticketplus.com.tw":"遠大售票","kklivetw.kktix.cc":"KKTIX","tkglobal.melon.com":"Melon Ticket","www.sistic.com.sg":"SISTIC","yyk1.ka-ruku.com":"センチュリー・ネットチケット","member.vaundy.jp":"Vaundy FC","hoshimachi-suisei-fc.jp":"星詠み FC","clubgnu.com":"CLUB GNU","radiocrazy.fm":"RADIO CRAZY","countdownjapan.jp":"COUNTDOWN JAPAN"};
+function ticketUrl(p){
+  if(p.url) return p.url;
+  const o=PHASE_URL.find(([a,t,n])=>a===p.a&&p.tour.includes(t)&&p.name.includes(n)); if(o) return o[3];
+  const r=showsFor(p); return (r&&TICKET[r.t.id])||(SOURCES[p.a]||[])[0]?.[1]||"";
+}
+function hostLabel(u){ try{ const h=new URL(u).hostname; return HOSTS[h]||"官方售票頁"; }catch(e){ return "售票頁"; } }
+function buyBtn(u,cls){ return u?`<a class="buy ${cls||""}" href="${u}" target="_blank" rel="noopener">前往${hostLabel(u)} ↗</a>`:""; }
+function showsFor(p){
+  let tid=p.tid, city=p.city;
+  if(!tid){ const r=LINK.find(([a,txt])=>a===p.a&&p.tour.includes(txt)); if(r){ tid=r[2]; city=r[3]; } }
+  const t=TOURS.find(x=>x.id===tid); if(!t) return null;
+  const cs=city?[].concat(city):null;
+  let shows=cs?t.shows.filter(s=>cs.includes(s[1])):t.shows;
+  if(p.dates) shows=t.shows.filter(s=>p.dates.includes(s[0]));
+  return {t,shows};
+}
+function showLine(p){
+  const r=showsFor(p); if(!r||!r.shows.length) return "";
+  return showLineFor(r.shows,p.a);
+}
+function showLineFor(s,artist){
+  if(!s.length) return "";
+  const today=japanToday(), p={a:artist};
+  const f=d=>{ const q=parts(d+"T00:00+09:00"); return `${q.y}/${q.m}/${q.d}(${q.wd})`; };
+  const allDone=s.every(x=>x[0]<today);
+  let body;
+  if(s.length<=4){
+    const venues=[...new Set(s.map(x=>`${x[1]} ${x[2].split("・")[0]}`))];
+    body=`<b>${s.map(x=>f(x[0])).join("、")}</b><span>${venues.join("／")}</span>`;
+  }else{
+    const cities=[...new Set(s.map(x=>x[1]))];
+    body=`<b>${f(s[0][0])} – ${f(s[s.length-1][0])}</b><span>共 ${s.length} 場・${cities.slice(0,6).join("、")}${cities.length>6?` 等 ${cities.length} 地`:""}　<a href="#${p.a}" data-jump="sec-shows">看全部場次 →</a></span>`;
+  }
+  return `<div class="showline ${allDone?"done":""}"><em>${allDone?"已演出":"演出日"}</em><div>${body}</div></div>`;
+}
+const calLink=(a,p,st)=>gcal(`【${a.name}】${p.name}${st.calLabel?"・"+st.calLabel:""}`,st.calStart,`${p.tour}\n${p.memo||""}`);
+
+function artistStats(k){
+  const today=japanToday(), now=Date.now();
+  const shows=TOURS.filter(t=>t.a===k).flatMap(t=>t.shows).filter(s=>s[0]>=today).sort((x,y)=>x[0]<y[0]?-1:1);
+  const open=PHASES.filter(p=>p.a===k&&status(p,now).cls==="st-open").length;
+  const soon=PHASES.filter(p=>p.a===k&&status(p,now).cls==="st-soon").length;
+  return {shows,open,soon};
+}
+
+function renderRail(el,current){
+  el.innerHTML=Object.entries(ARTISTS).filter(([k])=>k!==current||!el.classList.contains("compact")).map(([k,a])=>{
+    const s=artistStats(k), nx=s.shows[0], p=nx?parts(nx[0]+"T00:00+09:00"):null;
+    const tag=s.open?`<span class="tag live">${s.open} 個受付中</span>`:`<span class="tag">${s.shows.length} 場未演出</span>`;
+    return `<a class="poster" href="#${k}" data-mark="${a.mark}" style="--a:var(${a.color})" ${k===current?'aria-current="page"':""}>
+      ${tag}<span><span class="nm">${a.name}</span><span class="sub">${nx?`下一場 ${p.m}/${p.d} ${nx[1]}`:"目前沒有排定場次"}</span><span class="go">看完整資訊 →</span></span></a>`;
+  }).join("");
+}
+
+function renderHero(el,filter){
+  const now=Date.now();
+  const cand=PHASES.filter(filter).map(p=>({p,st:status(p,now)})).filter(x=>x.st.target).sort((x,y)=>x.st.group-y.st.group||x.st.key-y.st.key);
+  if(!cand.length){ el.style.setProperty("--a","var(--muted)"); el.innerHTML=`<div class="kicker">下一個要搶的票</div><h3>目前沒有排定的售票時間<small>新的售票公布後會出現在這裡</small></h3>`; return; }
+  const {p,st}=cand[0], a=ARTISTS[p.a]; el.style.setProperty("--a",`var(${a.color})`);
+  let d=Math.max(0,st.target-now); const D=Math.floor(d/864e5); d-=D*864e5; const H=Math.floor(d/36e5); d-=H*36e5; const M=Math.floor(d/6e4);
+  const tu=ticketUrl(p);
+  el.innerHTML=`
+    <div class="kicker"><span class="pill ${st.cls}">${st.label}</span><span>下一個要搶的票</span>${p.unverified?`<span class="flag">待確認</span>`:""}</div>
+    <h3>${a.name}・${p.name}<small>${p.tour}</small></h3>
+    ${showLine(p)}
+    <div>
+      <div class="clock" aria-label="倒數 ${D} 天 ${H} 小時 ${M} 分">
+        <div class="u"><b>${D}</b><span>天</span></div><div class="sep">:</div>
+        <div class="u"><b>${pad(H)}</b><span>小時</span></div><div class="sep">:</div>
+        <div class="u"><b>${pad(M)}</b><span>分</span></div>
+      </div>
+      <div class="clock-label">${st.verb}　<b>${fmt(st.anchor)}</b> ${isJST(st.anchor)?`日本時間・台灣 ${tw(st.anchor)}`:"台灣時間"}</div>
+    </div>
+    ${p.memo?`<div class="clock-label">${p.memo}</div>`:""}
+    <div class="actions">
+      ${tu?`<a class="btn primary" target="_blank" rel="noopener" href="${tu}">前往${hostLabel(tu)} ↗</a>`:""}
+      <a class="btn" target="_blank" rel="noopener" href="${calLink(a,p,st)}">加入 Google 日曆</a>
+    </div>`;
+}
+
+function renderCal(el,filterArtist){
+  const now=Date.now(), todayTW=twDate(new Date(now).toISOString());
+  const t=new Date(todayTW+"T00:00:00Z"), dow=(t.getUTCDay()+6)%7, start=new Date(t.getTime()-dow*864e5);
+  const evs={}, add=(d,o)=>{(evs[d]=evs[d]||[]).push(o)};
+  PHASES.filter(p=>filterArtist(p.a)&&!p.cancelled).forEach(p=>{
+    const a=ARTISTS[p.a];
+    if(p.kind==="point") add(twDate(p.at),{a,txt:`${a.short} ${p.name}`});
+    if(p.kind==="range"){ add(twDate(p.start),{a,txt:`${a.short} 開始`}); if(p.end) add(twDate(p.end),{a,txt:`${a.short} 截止`}); if(p.result) add(twDate(p.result),{a,txt:`${a.short} 結果`}); }
+  });
+  TOURS.filter(x=>filterArtist(x.a)).forEach(x=>x.shows.forEach(s=>add(s[0],{a:ARTISTS[x.a],txt:s[1],cls:"show"})));
+  let html=["一","二","三","四","五","六","日"].map(d=>`<div class="dow">${d}</div>`).join("");
+  for(let i=0;i<35;i++){
+    const d=new Date(start.getTime()+i*864e5).toISOString().slice(0,10), p=parts(d);
+    const list=(evs[d]||[]).sort((x,y)=>(x.cls==="show")-(y.cls==="show")), shown=list.slice(0,3), more=list.length-shown.length;
+    html+=`<div class="day ${d<todayTW?"old":""} ${d===todayTW?"today":""}" title="${list.map(e=>e.a.name+" "+e.txt).join("\n")}">
+      <div class="n"><span>${p.d===1||i===0?`${p.m}/${p.d}`:p.d}</span>${more>0?`<span>+${more}</span>`:""}</div>
+      ${shown.map(e=>`<div class="ev ${e.cls||""}" style="--a:var(${e.a.color})">${e.txt}</div>`).join("")}</div>`;
+  }
+  el.innerHTML=html;
+}
+
+/* One card per artist + tour: phases close in time for the same shows are listed together inside it. */
+function fmtShort(s){ const p=parts(s); return `${p.m}/${p.d}(${p.wd}) ${p.hm}${isJST(s)?"":" 台灣"}`; }
+function phaseTimes(p){
+  if(p.kind==="range") return `${fmtShort(p.start)} – ${p.end?fmtShort(p.end):"截止未公布"}${p.result?`・結果 ${fmtShort(p.result)}`:""}`;
+  if(p.kind==="point") return fmtShort(p.at);
+  return "日期未公布";
+}
+function renderTickets(el,filter){
+  const now=Date.now();
+  const rows=PHASES.filter(filter).map(p=>({p,st:status(p,now),r:showsFor(p),u:ticketUrl(p)}))
+    .filter(x=>state.past||x.st.group<3);
+  const groups=new Map();
+  for(const x of rows){ const k=x.p.a+"|"+(x.r?x.r.t.id:x.p.tour); if(!groups.has(k)) groups.set(k,[]); groups.get(k).push(x); }
+  const cards=[...groups.values()].map(items=>{
+    items.sort((x,y)=>x.st.group-y.st.group||x.st.key-y.st.key);
+    return {items,top:items[0],allPast:items.every(x=>x.st.group===3)};
+  }).sort((x,y)=>(x.allPast-y.allPast)||(x.top.st.group-y.top.st.group)||(x.top.st.key-y.top.st.key));
+  el.innerHTML=cards.map(({items,top,allPast})=>{
+    const a=ARTISTS[top.p.a], st=top.st, an=st.anchor?parts(st.anchor):null;
+    const title=top.r?top.r.t.title:top.p.tour;
+    // shows covered by this card
+    const seen=new Set(), shows=[];
+    items.forEach(x=>(x.r?x.r.shows:[]).forEach(s=>{ const k=s[0]+s[1]; if(!seen.has(k)){ seen.add(k); shows.push(s); } }));
+    shows.sort((x,y)=>x[0]<y[0]?-1:1);
+    // main ticket link = most common one
+    const cnt={}; items.forEach(x=>{ if(x.u) cnt[x.u]=(cnt[x.u]||0)+1; });
+    const mainU=Object.keys(cnt).sort((x,y)=>cnt[y]-cnt[x])[0]||"";
+    // rows: same phase name merged
+    const byName=new Map(); items.forEach(x=>{ if(!byName.has(x.p.name)) byName.set(x.p.name,[]); byName.get(x.p.name).push(x); });
+    const hasJST=items.some(x=>[x.p.start,x.p.end,x.p.at,x.p.result].some(t=>t&&isJST(t)));
+    const rowsHtml=[...byName.entries()].map(([name,list])=>{
+      const f=list[0], p=f.p;
+      const extra=(f.u&&f.u!==mainU)?`<a class="mini" href="${f.u}" target="_blank" rel="noopener">前往${hostLabel(f.u)} ↗</a>`:"";
+      const cal=f.st.calStart?`<a class="mini" href="${calLink(a,p,f.st)}" target="_blank" rel="noopener">＋日曆</a>`:"";
+      if(list.length===1) return `<div class="prow ${f.st.cls} ${f.st.group===3?"past":""}">
+        <div class="ph"><span class="pill ${f.st.cls}">${f.st.label}</span><b>${name}</b>${p.unverified?`<span class="flag">待確認</span>`:""}${f.st.count?`<span class="cnt">${f.st.count}</span>`:""}</div>
+        <div class="pt">${phaseTimes(p)}</div>
+        ${p.memo?`<div class="pm">${p.memo}</div>`:""}
+        ${(extra||cal)?`<div class="pa">${extra}${cal}</div>`:""}
+      </div>`;
+      const firstShow=x=>(x.r&&x.r.shows[0]?x.r.shows[0][0]:"");
+      const lines=[...list].sort((x,y)=>firstShow(x)<firstShow(y)?-1:1).map(x=>{ const s=x.r&&x.r.shows[0]; const q=s?parts(s[0]+"T00:00+09:00"):null;
+        return `<li class="${x.st.group===3?"past":""}"><span class="lw">${q?`${q.m}/${q.d} ${s[1]}`:""}</span><span class="lt">${phaseTimes(x.p)}</span><span class="pill ${x.st.cls}">${x.st.label}</span></li>`; }).join("");
+      return `<div class="prow ${f.st.cls}">
+        <div class="ph"><span class="pill ${f.st.cls}">${f.st.label}</span><b>${name}</b><span class="cnt">${list.length} 場</span></div>
+        ${p.memo?`<div class="pm">${p.memo}</div>`:""}
+        <ul class="plist">${lines}</ul>
+        ${(extra||cal)?`<div class="pa">${extra}${cal}</div>`:""}
+      </div>`;
+    }).join("");
+    return `<article class="ticket ${allPast?"past":""} ${st.cls}" style="--a:var(${a.color})">
+      <div class="main">
+        <div class="head"><a class="artist" href="#${top.p.a}">${a.name}</a><span class="tour">${title}</span></div>
+        ${showLineFor(shows,top.p.a)}
+        <div class="prows">${rowsHtml}</div>
+        ${hasJST?`<div class="tznote">時間為日本時間，台灣時間要減 1 小時</div>`:""}
+        <div class="buyrow">${buyBtn(mainU)}</div>
+      </div>
+      <div class="stub">
+        <div><div class="sub lbl">下一個時間點</div><div class="big">${an?`${an.m}<small>/</small>${an.d}`:"—"}</div><div class="sub">${an?`週${an.wd} ${an.hm} ${st.cap||""}`:"日期未定"}</div></div>
+        <div class="stamp">${st.label}</div>
+        ${st.count?`<div class="count">${st.count}</div>`:""}
+        <div class="sub">${top.p.name}</div>
+      </div>
+    </article>`;
+  }).join("")||`<p class="note">目前沒有進行中或即將開始的售票。</p>`;
+}
+
+function renderUpNext(){
+  const today=japanToday();
+  const all=TOURS.flatMap(t=>t.shows.map(s=>({s,t}))).filter(x=>x.s[0]>=today).sort((x,y)=>x.s[0]<y.s[0]?-1:1).slice(0,10);
+  $("upnext").innerHTML=all.map(({s,t})=>{ const a=ARTISTS[t.a], p=parts(s[0]+"T00:00+09:00");
+    return `<a href="#${t.a}" style="--a:var(${a.color})"><span class="d">${p.y}.${pad(p.m)}.${pad(p.d)} ${p.wd}</span><span class="w"><b>${s[1]}・${s[2]}</b><span>${t.title}</span></span><span class="who">${a.name}</span></a>`; }).join("");
+}
+
+function renderArtist(k){
+  const a=ARTISTS[k], s=artistStats(k), now=Date.now();
+  const allShows=TOURS.filter(t=>t.a===k).reduce((n,t)=>n+t.shows.length,0);
+  const links=[a.site,a.fc].filter(Boolean).map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l} ↗</a>`).join("");
+  const b=$("banner"); b.style.setProperty("--a",`var(${a.color})`); b.dataset.mark=a.mark;
+  b.innerHTML=`<div class="jp">${a.jp}</div><h1>${a.name}</h1>
+    <div class="stats">
+      <div class="stat"><b>${s.open}</b><span>受付中</span></div>
+      <div class="stat"><b>${s.soon}</b><span>即將開始</span></div>
+      <div class="stat"><b>${s.shows.length}</b><span>場未演出／共 ${allShows} 場</span></div>
+      ${s.shows[0]?`<div class="stat"><b>${parts(s.shows[0][0]+"T00:00+09:00").m}/${parts(s.shows[0][0]+"T00:00+09:00").d}</b><span>下一場 ${s.shows[0][1]}</span></div>`:""}
+    </div>
+    <div class="links">${links}</div>`;
+  renderHero($("hero-artist"),p=>p.a===k);
+  renderTickets($("tickets-artist"),p=>p.a===k);
+  renderCal($("cal-artist"),x=>x===k);
+  const today=japanToday();
+  $("tours-artist").innerHTML=TOURS.filter(t=>t.a===k).map(t=>{
+    const ni=t.shows.findIndex(x=>x[0]>=today);
+    const rows=t.shows.map((x,i)=>{ const p=parts(x[0]+"T00:00+09:00"); return `<tr class="${x[0]<today?"done":""} ${i===ni?"next":""}"><td class="d">${p.y}.${pad(p.m)}.${pad(p.d)} ${p.wd}</td><td class="c">${x[1]}</td><td class="v">${x[2]}</td></tr>`; }).join("");
+    return `<article class="tourblock" style="--a:var(${a.color})"><div class="tb-head"><h4>${t.title}</h4><div class="facts">${t.facts.map(([l,v])=>`<span class="fact">${l} <b>${v}</b></span>`).join("")}</div>${TICKET[t.id]?`<div class="buyrow">${buyBtn(TICKET[t.id],"ghost")}</div>`:""}</div>
+      <div class="tbl"><table>${rows}</table></div>${t.note?`<p class="note">${t.note}</p>`:""}</article>`;
+  }).join("");
+  $("srcs-artist").innerHTML=(SOURCES[k]||[]).map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l}</a>`).join("");
+  renderRail($("rail-artist"),k);
+}
+
+let shown=null;
+function route(key){
+  const k=key!==undefined?key:location.hash.slice(1);
+  shown=ARTISTS[k]?k:"";
+  if(ARTISTS[k]){
+    $("home").hidden=true; $("artist").hidden=false; renderArtist(k);
+    document.title=`${ARTISTS[k].name}｜日系演唱會搶票表`;
+  }else{
+    $("artist").hidden=true; $("home").hidden=false;
+    renderRail($("rail-home"),null); renderHero($("hero-home"),()=>true); renderCal($("cal-home"),()=>true); renderTickets($("tickets-home"),p=>!p.homeHide); renderUpNext();
+    document.title="日系演唱會搶票表";
+  }
+}
+document.querySelectorAll("[data-past]").forEach(btn=>btn.onclick=()=>{
+  state.past=!state.past;
+  document.querySelectorAll("[data-past]").forEach(b=>b.textContent=state.past?"隱藏已結束的售票":"顯示已結束的售票");
+  route();
+});
+/* In-page links (#artist) are handled here so they work even when the viewer does not pass hash changes through. */
+function go(k,jump){
+  const target=ARTISTS[k]?k:"";
+  if(target!==shown) route(target);
+  try{ if(location.hash.slice(1)!==target) location.hash=target; }catch(e){}
+  setTimeout(()=>{ const el=jump&&$(jump); if(el) el.scrollIntoView({block:"start"}); else window.scrollTo(0,0); },0);
+}
+document.addEventListener("click",e=>{
+  const a=e.target.closest&&e.target.closest('a[href^="#"]'); if(!a) return;
+  e.preventDefault(); go(a.getAttribute("href").slice(1),a.dataset.jump);
+});
+window.addEventListener("hashchange",()=>{ const k=location.hash.slice(1); if((ARTISTS[k]?k:"")===shown) return; route(); window.scrollTo(0,0); });
+(function(){ const n=new Date(Date.now()+8*3600e3); $("today").innerHTML=`今天・台灣時間<b>${n.getUTCMonth()+1}/${n.getUTCDate()} ${WD[n.getUTCDay()]}</b>`; })();
+route();
+setInterval(()=>route(shown),60e3);
+</script>
