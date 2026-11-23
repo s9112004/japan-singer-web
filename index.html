@@ -383,6 +383,7 @@ const PHASES = [
   {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"いち早プレリザーブ（ぴあ）", kind:"range", start:"2026-05-25T12:00+09:00", end:"2026-05-31T23:59+09:00", result:"2026-06-06T18:00+09:00", memo:"限ぴあ卡付款"},
   {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"SS／S 區升級・FC 轉售", kind:"tba", memo:"官方說之後公布，限 FC 先行當選者"},
   {a:"suisei", tour:"MGO 2nd LIVE “Project: Allegro”", name:"一般發售", kind:"tba", cancelled:true, memo:"FC 售票頁寫明沒有一般發售，先行剩下的票也不會釋出・ぴあ 10 個先行階段都已結束"},
+  {a:"suisei", tour:"MGO RE:IGNITION「Midnight Mission」", name:"免費入場 先着受付", kind:"range", start:"2026-11-21T11:00+09:00", end:"2026-12-04T23:59+09:00", url:"https://tixplus.jp/feature/midnightgrandorchestra/live2026/general-weu3h/", memo:"全席免費・先搶先贏，額滿就提早結束・每人每場限 4 張（可報多場）・チケプラ App 電子票，需日本手機號碼（SMS 認證）・原本買票的人退款，並優先排前方站區"},
 
   {a:"yoasobi", tour:"超惑星 日本巨蛋場", name:"一般發售（先着）", kind:"point", at:"2026-10-10T12:00+09:00", memo:"東京場在 ローチケ 顯示售完"},
   {a:"yoasobi", tour:"超惑星 北海道場", name:"官方轉售 抽選", kind:"range", start:"2026-11-07T15:00+09:00", end:"2026-11-09T23:59+09:00", result:"2026-11-12T18:00+09:00", memo:"ローチケ限定・僅限信用卡・只能申請 1 張"},
@@ -465,6 +466,9 @@ const TOURS = [
   {id:"suisei-pajama", a:"suisei", title:"星詠み ぱじゃまぱーてぃー Vol.2（FC 見面會）", facts:[["日本","3 都市 3 場"],["票價","指定席 ¥8,800（附周邊）"],["申請","星詠み FC"]],
    shows:[["2027-02-07","大分","iichikoグランシアタ・18:00"],["2027-02-20","石川","松任文化会館 ピーノ・18:00"],["2027-02-27","秋田","あきた芸術劇場 ミルハス 中ホール・18:00"]],
    note:"FC 會員限定的見面會，每人限 1 張、入場要驗本人。大分場現在開放會員先着先行，也開放住在九州・沖縄的非會員從ぴあ申請。"},
+  {id:"suisei-mgo1", a:"suisei", title:"Midnight Grand Orchestra RE:IGNITION Series「Midnight Mission」", facts:[["千葉","2 場"],["票價","全席免費（需先登記）"],["受付","チケプラ 先着"]],
+   shows:[["2026-12-05","千葉","LaLa arena TOKYO-BAY"],["2026-12-06","千葉","LaLa arena TOKYO-BAY"]],
+   note:"重現 2024/2/20 豊洲PIT 的 1st LIVE，星街すいせい的歌聲與演出用當天的錄製資料重現，樂團現場演奏。10/28 官方宣布改為全席免費，已購票者退款（12 月中旬起 GMO 寄送退款手續信），並優先安排前方站區。"},
   {id:"suisei-mgo", a:"suisei", title:"Midnight Grand Orchestra 2nd LIVE “Project: Allegro”", facts:[["千葉","1 場"],["票價","站席 ¥11,000"]],
    shows:[["2027-02-11","千葉","幕張メッセ 4-6ホール・17:00"]],
    note:"星街すいせい × TAKU INOUE。只有站席，每人限 2 張。所有先行都已結束，官方表示不會一般發售。SS／S 區升級和 FC 轉售之後公布。"},
@@ -521,7 +525,7 @@ const TOURS = [
 const SOURCES = {
   yonezu:[["官方售票","https://ticket.kenshiyonezu.jp/tour/2026"],["THE FIRST TIMES","https://www.thefirsttimes.jp/news/0000840280/"],["Real Sound","https://realsound.jp/2026/10/post-2555048.html"],["台北場整理","https://www.shinygoods.tw/kenshi-yonezu-taipei-dome-2026-concert-guide"],["商業周刊","https://www.businessweekly.com.tw/style/blog/3023463"]],
   kinggnu:[["CLUB GNU","https://clubgnu.com/10th_KICKOFF/"],["Sony Music 票務詳情","https://www.sonymusic.co.jp/artist/kinggnu/info/587088"],["官方延長公告","https://www.sonymusic.co.jp/artist/kinggnu/info/587876"],["US TOUR '27","https://www.sonymusic.co.jp/artist/kinggnu/info/588333"]],
-  suisei:[["星詠み 售票列表","https://hoshimachi-suisei-fc.jp/s/hs/ticket/list"],["星詠み 巡演票務","https://hoshimachi-suisei-fc.jp/s/hs/page/arena_tour_2026_ticket"],["ぱじゃまぱーてぃー Vol.2","https://hoshimachi-suisei-fc.jp/s/hs/page/pajamaparty"],["大分場 FC 受付","https://hoshimachi-suisei-fc.jp/s/hs/ticket/detail/261106"],["ぴあ 九州・沖縄受付","https://w.pia.jp/t/hsfmtg-v2/"],["Project: Allegro","https://hoshimachi-suisei-fc.jp/Project_Allegro/"],["PR TIMES","https://prtimes.jp/main/html/rd/p/000000188.000170825.html"],["音樂ナタリー","https://natalie.mu/music/news/665040"]],
+  suisei:[["MGO Midnight Mission 官方","https://midnight-grand-orchestra.jp/midnight-mission-re-ignition/"],["MoguLive：改為免費","https://www.moguravr.com/?p=380293"],["星詠み 售票列表","https://hoshimachi-suisei-fc.jp/s/hs/ticket/list"],["星詠み 巡演票務","https://hoshimachi-suisei-fc.jp/s/hs/page/arena_tour_2026_ticket"],["ぱじゃまぱーてぃー Vol.2","https://hoshimachi-suisei-fc.jp/s/hs/page/pajamaparty"],["大分場 FC 受付","https://hoshimachi-suisei-fc.jp/s/hs/ticket/detail/261106"],["ぴあ 九州・沖縄受付","https://w.pia.jp/t/hsfmtg-v2/"],["Project: Allegro","https://hoshimachi-suisei-fc.jp/Project_Allegro/"],["PR TIMES","https://prtimes.jp/main/html/rd/p/000000188.000170825.html"],["音樂ナタリー","https://natalie.mu/music/news/665040"]],
   yoasobi:[["官方：韓國高陽終場","https://www.yoasobi-music.jp/news/588606"],["韓國場官方售票連結頁","https://to.livet.one/YOASOBI2027"],["官方：巡演改名與場次","https://www.yoasobi-music.jp/news/588376"],["官方：官方轉售","https://www.yoasobi-music.jp/news/587745"],["官方：一般發售","https://www.yoasobi-music.jp/news/587488"],["官方：台北場售完","https://www.yoasobi-music.jp/news/587197"],["巡演特設頁","https://www.yoasobi-music.jp/special/superplanet/"],["ローチケ 轉售","https://l-tike.com/yoasobi/"],["商業周刊","https://www.businessweekly.com.tw/style/blog/3022368"]],
   zutomayo:[["官方巡演頁","https://zutomayo.net/apicula/"],["音樂ナタリー","https://natalie.mu/music/news/694085"]],
   hisaishi:[["官方 2026 演出表","https://joehisaishi.com/concert_category/2026/"],["官方 2027 演出表","https://joehisaishi.com/concert_category/2027/"],["MUSIC FUTURE Vol.13","https://joehisaishi-concert.com/mf-vol13/"],["From Paris to Hollywood","https://aegx.jp/schedule/12/2026/2324/"],["日本センチュリー 大阪","https://jcso.or.jp/concert/10097/"],["日本センチュリー 京都","https://jcso.or.jp/concert/10328/"],["Deutsche Grammophon","https://www.deutschegrammophon.com/en/artists/joe-hisaishi/on-tour"],["SISTIC 新加坡","https://www.sistic.com.sg/events/joe1126"]],
@@ -563,7 +567,7 @@ function status(p,now){
 const LINK=[
   ["yonezu","台北","yonezu-world","台北"],["yonezu","","yonezu-jp"],
   ["kinggnu","","kinggnu"],
-  ["suisei","大分","suisei-pajama","大分"],["suisei","ぱじゃま","suisei-pajama"],["suisei","Allegro","suisei-mgo"],["suisei","福岡","suisei-arena","福岡"],["suisei","","suisei-arena"],
+  ["suisei","大分","suisei-pajama","大分"],["suisei","ぱじゃま","suisei-pajama"],["suisei","Midnight Mission","suisei-mgo1"],["suisei","Allegro","suisei-mgo"],["suisei","福岡","suisei-arena","福岡"],["suisei","","suisei-arena"],
   ["yoasobi","北海道","yoasobi","北海道"],["yoasobi","福岡","yoasobi","福岡"],["yoasobi","東京","yoasobi","東京"],["yoasobi","台北","yoasobi","台北"],["yoasobi","高陽","yoasobi","高陽"],["yoasobi","日本","yoasobi",["大阪","愛知","北海道","福岡","東京"]],
   ["zutomayo","","zutomayo"],
   ["hisaishi","MUSIC FUTURE","hisaishi-mf13"],["hisaishi","Hollywood","hisaishi-desplat"],["hisaishi","センチュリー","hisaishi-jcso"],
@@ -574,7 +578,7 @@ const TICKET={
   "yonezu-jp":"https://ticket.kenshiyonezu.jp/tour/2026", "yonezu-world":TP,
   "kinggnu":"https://clubgnu.com/10th_KICKOFF/", "kinggnu-us":"https://clubgnu.com/US_tour27/",
   "suisei-arena":"https://hoshimachi-suisei-fc.jp/s/hs/page/arena_tour_2026_ticket", "suisei-pajama":"https://hoshimachi-suisei-fc.jp/s/hs/page/pajamaparty",
-  "suisei-mgo":"https://hoshimachi-suisei-fc.jp/Project_Allegro/", "suisei-bansan":"https://eplus.jp/hoshifuru_bansankai/",
+  "suisei-mgo1":"https://midnight-grand-orchestra.jp/midnight-mission-re-ignition/", "suisei-mgo":"https://hoshimachi-suisei-fc.jp/Project_Allegro/", "suisei-bansan":"https://eplus.jp/hoshifuru_bansankai/",
   "yoasobi":"https://www.yoasobi-music.jp/", "zutomayo":"https://zutomayo.net/apicula/",
   "hisaishi-26":"https://www.sistic.com.sg/events/joe1126", "hisaishi-mf13":"https://joehisaishi-concert.com/mf-vol13/",
   "hisaishi-desplat":"https://aegx.jp/schedule/12/2026/2324/", "hisaishi-jcso":"https://yyk1.ka-ruku.com/jcso-s/showList", "hisaishi-27":"https://joehisaishi.com/concert_category/2027/",
@@ -592,7 +596,7 @@ const PHASE_URL=[
   ["tuki","COUNTDOWN","","https://countdownjapan.jp/2627/news/5987/"],
   ["tuki","COUNTDOWN","","https://countdownjapan.jp/2627/ticket/"],
 ];
-const HOSTS={"eplus.jp":"e+","w.pia.jp":"チケットぴあ","ticketplus.com.tw":"遠大售票","kklivetw.kktix.cc":"KKTIX","tkglobal.melon.com":"Melon Ticket","www.sistic.com.sg":"SISTIC","yyk1.ka-ruku.com":"センチュリー・ネットチケット","member.vaundy.jp":"Vaundy FC","hoshimachi-suisei-fc.jp":"星詠み FC","clubgnu.com":"CLUB GNU","radiocrazy.fm":"RADIO CRAZY","countdownjapan.jp":"COUNTDOWN JAPAN"};
+const HOSTS={"eplus.jp":"e+","tixplus.jp":"チケプラ","w.pia.jp":"チケットぴあ","ticketplus.com.tw":"遠大售票","kklivetw.kktix.cc":"KKTIX","tkglobal.melon.com":"Melon Ticket","www.sistic.com.sg":"SISTIC","yyk1.ka-ruku.com":"センチュリー・ネットチケット","member.vaundy.jp":"Vaundy FC","hoshimachi-suisei-fc.jp":"星詠み FC","clubgnu.com":"CLUB GNU","radiocrazy.fm":"RADIO CRAZY","countdownjapan.jp":"COUNTDOWN JAPAN"};
 function ticketUrl(p){
   if(p.url) return p.url;
   const o=PHASE_URL.find(([a,t,n])=>a===p.a&&p.tour.includes(t)&&p.name.includes(n)); if(o) return o[3];
